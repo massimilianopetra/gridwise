@@ -20,7 +20,7 @@ export default function NavLinks() {
     
     links = [{ name: 'Home', href: '/', icon: HomeIcon },
              { name: 'Liquidity', href: '/liquidity', icon: WaterDropIcon},
-             { name: 'Geometric Grid', href: '/geometricgrid', icon: ViewHeadlineIcon},];
+             { name: 'Grid Calculator', href: '/gridcalculator', icon: ViewHeadlineIcon},];
 
     return (
         <>

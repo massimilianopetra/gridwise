@@ -1,11 +1,11 @@
-import GeoGridCard from '@/app/ui/geogrid-card';
+import GridCard from '@/app/ui/grid-card';
 
 export default function Home() {
   return (
     <div style={{ height: 250, width: '100%' }}>
       <main>
         <h1>
-          <GeoGridCard />
+          <GridCard />
         </h1>
       </main>
     </div>

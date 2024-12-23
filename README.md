@@ -1,1 +1,1 @@
-# AI TRading Bot based on Grid System
+# AI Trading Bot based on Grid Systemgit 
