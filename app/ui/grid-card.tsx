@@ -110,7 +110,7 @@ export default function GridCard() {
             <Typography className="text-white" variant="h5" gutterBottom>
               Resulting Grids
             </Typography>
-            <div className='flex flex-row'>>
+            <div className='flex flex-row'>
               <Box className="bg-blue-100" sx={{ height: 400, width: "50%" }}>
                 <DataGrid
                   rows={rb}
