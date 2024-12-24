@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SideNav from '@/app/ui/sidenav';
+import Footer from '@/app/ui/footer'
 
 
 export const metadata: Metadata = {
@@ -13,16 +14,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body>
-        <div className="flex h-screen flex-col lg:flex-row lg:overflow-hidden bg-gray-900">
-          <div className="w-full flex-none lg:w-64">
-            <SideNav />
+
+    return (
+      <html lang="en">
+        <body>
+          <div className="flex h-screen flex-col lg:flex-row bg-gray-900">
+            {/* SideNav */}
+            <div className="w-full flex-none lg:w-64">
+              <SideNav />
+            </div>
+  
+            {/* Main Content Area */}
+            <div className="flex flex-col flex-grow lg:overflow-hidden">
+              {/* Scrolling Content */}
+              <div className="flex-grow overflow-y-auto">
+                {children}
+              </div>
+              {/* Footer */}
+              <Footer />
+            </div>
           </div>
-          <div className="flex-grow p-6 lg:overflow-y-auto lg:p-12">{children}</div>
-        </div>
-      </body>
-    </html>
-  );
+        </body>
+      </html>
+    );
+
 }

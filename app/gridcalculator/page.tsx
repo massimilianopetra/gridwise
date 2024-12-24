@@ -5,6 +5,7 @@ export default function Home() {
     <div style={{ height: 250, width: '100%' }}>
       <main>
         <h1>
+          <br></br>
           <GridCard />
         </h1>
       </main>

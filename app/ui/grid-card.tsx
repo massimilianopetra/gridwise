@@ -5,23 +5,27 @@ import { Card, CardContent, CardActions, TextField, Typography, Button } from '@
 import Switch from '@mui/material/Switch';
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
-type buyttype =   {
+type buyType = {
   id: number;
   buyQuantity: number;
   buyPrice: number;
 };
 
-type selltype =   {
+type sellType = {
   id: number;
   sellQuantity: number;
   sellPrice: number;
+  earn: number;
 };
 
 export default function GridCard() {
+  const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(false);
-  const [rb, setrowsBuy] = useState<buyttype[]>([]);
-  const [rs, setrowsSell] = useState<selltype[]>([]);
+  const [rb, setrowsBuy] = useState<buyType[]>([]);
+  const [rs, setrowsSell] = useState<sellType[]>([]);
   const [status, setStatus] = useState("initial");
   const inputInvestmentRef = useRef<HTMLInputElement>(null);
   const inputCurrencyRef = useRef<HTMLInputElement>(null);
@@ -32,70 +36,120 @@ export default function GridCard() {
 
 
   const handleCalculation = () => {
+    setStatus("computing");
     const investment = parseFloat(inputInvestmentRef.current?.value || '0');
     const Pa = parseFloat(inputPaRef.current?.value || '0');
     const Pb = parseFloat(inputPbRef.current?.value || '0');
     const P = parseFloat(inputPRef.current?.value || '0');
-    const n = parseFloat(inputNGridRef.current?.value || '1');
+    const n = parseFloat(inputNGridRef.current?.value || '0');
 
     const grid_gain = (Pb / Pa) ** (1 / n);
-    var _rb = [];
-    
-    for (let i = 0; i < n; i++) {
-      const price = Pa*(grid_gain**i);
-      _rb.push({id: i+1, buyQuantity: 10, buyPrice: price})
+    var _rb: buyType[] = [];
+    var _rs: sellType[] = [];
+
+    // Controllo congruenza parametri
+    if (Pa > 0 && Pb > 0 && investment > 0 && n > 2) {
+
+      for (let i = 0; i < n; i++) {
+
+        const priceBuy = Pa * (grid_gain ** i);
+        const priceSell = Pa * (grid_gain ** (i + 1));
+        const qty = (investment / n) / priceBuy
+        const earn = qty * (priceSell - priceBuy);
+        _rb.push({ id: i + 1, buyQuantity: qty, buyPrice: priceBuy });
+        _rs.push({ id: i + 1, sellQuantity: qty, sellPrice: priceSell, earn: earn });
+
+      }
+
+      ;
+
+      setrowsBuy(_rb);
+      setrowsSell(_rs);
+      setStatus("computed");
+    } else {
+      setStatus("initial");
+      setOpen(true);
     }
-    setrowsBuy(_rb);
-    setStatus("computed");
 
   };
 
   const columnsBuy: GridColDef[] = [
     {
-      field: "buyQuantity",
-      headerName: "Quantità",
+      field: "id",
+
       width: 120,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
+          <div>N.</div>
+        </div>
+      ),
+    },
+    {
+      field: "buyQuantity",
+
+      width: 200,
+      renderHeader: () => (
+        <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Buy</div>
-          <div>Quantità</div>
+          <div>Quantity</div>
         </div>
       ),
     },
     {
       field: "buyPrice",
-      headerName: "Prezzo",
-      width: 120,
+
+      width: 200,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Buy</div>
-          <div>Prezzo</div>
+          <div>Price</div>
         </div>
       ),
     },
+
 
   ];
 
   const columnsSell: GridColDef[] = [
     {
-      field: "sellQuantity",
-      headerName: "Quantità",
+      field: "id",
+
       width: 120,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
+          <div>N.</div>
+        </div>
+      ),
+    },
+    {
+      field: "sellQuantity",
+
+      width: 200,
+      renderHeader: () => (
+        <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Sell</div>
-          <div>Quantità</div>
+          <div>Quantity</div>
         </div>
       ),
     },
     {
       field: "sellPrice",
-      headerName: "Prezzo",
-      width: 120,
+
+      width: 200,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Sell</div>
-          <div>Prezzo</div>
+          <div>Price</div>
+        </div>
+      ),
+    },
+    {
+      field: "earn",
+
+      width: 200,
+      renderHeader: () => (
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontWeight: "bold" }}>Earn</div>
         </div>
       ),
     },
@@ -106,41 +160,44 @@ export default function GridCard() {
     switch (status) {
       case "computed":
         return (
-          <div className='flex flex-col text-center'>
-            <Typography className="text-white" variant="h5" gutterBottom>
-              Resulting Grids
-            </Typography>
-            <div className='flex flex-row'>
-              <Box className="bg-blue-100" sx={{ height: 400, width: "50%" }}>
-                <DataGrid
-                  rows={rb}
-                  columns={columnsBuy}
-                  sx={{
-                    "& .MuiDataGrid-row:nth-of-type(even)": {
-                      backgroundColor: "whitesmoke", // Righe pari
-                    },
-                    "& .MuiDataGrid-row:nth-of-type(odd)": {
-                      backgroundColor: "white", // Righe dispari
-                    },
-                  }}
-                />
-              </Box>)
-              < Box className="bg-blue-100" sx={{ height: 400, width: "50%" }}>
-                <DataGrid
-                  rows={rs}
-                  columns={columnsSell}
-                  sx={{
-                    "& .MuiDataGrid-row:nth-of-type(even)": {
-                      backgroundColor: "whitesmoke", // Righe pari
-                    },
-                    "& .MuiDataGrid-row:nth-of-type(odd)": {
-                      backgroundColor: "white", // Righe dispari
-                    },
-                  }}
-                />
-              </Box >
+          <Card className="bg-blue-100 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
+            <div className='flex flex-col text-center'>
+              <Typography className="text-blue-900" variant="h5" gutterBottom>
+                Resulting Grids
+              </Typography>
+              <div className='flex flex-row'>
+                <Box className="bg-blue-100" sx={{ height: 400, width: "50%" }}>
+                  <DataGrid
+                    rows={rb}
+                    columns={columnsBuy}
+                    sx={{
+                      "& .MuiDataGrid-row:nth-of-type(even)": {
+                        backgroundColor: "whitesmoke", // Righe pari
+                      },
+                      "& .MuiDataGrid-row:nth-of-type(odd)": {
+                        backgroundColor: "white", // Righe dispari
+                      },
+                    }}
+                  />
+                </Box>
+                < Box className="bg-blue-100" sx={{ height: 400, width: "50%" }}>
+                  <DataGrid
+                    rows={rs}
+                    columns={columnsSell}
+                    sx={{
+                      "& .MuiDataGrid-row:nth-of-type(even)": {
+                        backgroundColor: "whitesmoke", // Righe pari
+                      },
+                      "& .MuiDataGrid-row:nth-of-type(odd)": {
+                        backgroundColor: "white", // Righe dispari
+                      },
+                    }}
+                  />
+                </Box >
+              </div>
             </div>
-          </div>)
+          </Card>
+          );
 
       default:
         return (<Box></Box>);
@@ -203,17 +260,6 @@ export default function GridCard() {
           />
           <TextField
             className='bg-white rounded-md'
-            inputRef={inputPRef}
-            type="number"
-            label="Current Price"
-            fullWidth
-            margin="normal"
-            slotProps={{
-              inputLabel: { shrink: true },
-            }}
-          />
-          <TextField
-            className='bg-white rounded-md'
             inputRef={inputNGridRef}
             type="number"
 
@@ -242,6 +288,16 @@ export default function GridCard() {
       <div>
         {render()}
       </div>
+
+      <Snackbar open={open} autoHideDuration={6000} onClose={() => { setOpen(false) }} anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}>
+        <Alert
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          Input value wrong
+        </Alert>
+      </Snackbar>
 
     </div>
   );
