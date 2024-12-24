@@ -87,7 +87,7 @@ export default function GridCard() {
     {
       field: "buyQuantity",
 
-      width: 200,
+      width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Buy</div>
@@ -98,7 +98,7 @@ export default function GridCard() {
     {
       field: "buyPrice",
 
-      width: 200,
+      width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Buy</div>
@@ -124,7 +124,7 @@ export default function GridCard() {
     {
       field: "sellQuantity",
 
-      width: 200,
+      width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Sell</div>
@@ -135,7 +135,7 @@ export default function GridCard() {
     {
       field: "sellPrice",
 
-      width: 200,
+      width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Sell</div>
@@ -146,7 +146,7 @@ export default function GridCard() {
     {
       field: "earn",
 
-      width: 200,
+      width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Earn</div>
