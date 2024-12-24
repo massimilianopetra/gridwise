@@ -12,8 +12,10 @@ type gridType = {
   id: number;
   Quantity: number;
   buyPrice: number;
+  capital: number;
   sellPrice: number;
   earn: number;
+  status: string;
 };
 
 export default function GridCard() {
@@ -41,7 +43,7 @@ export default function GridCard() {
     var _r: gridType[] = [];
 
     // Controllo congruenza parametri
-    if (Pa > 0 && Pb > 0 && investment > 0 && n > 2) {
+    if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {
 
       for (let i = 0; i < n; i++) {
 
@@ -49,8 +51,13 @@ export default function GridCard() {
         const priceSell = Pa * (grid_gain ** (i + 1));
         const qty = (investment / n) / priceBuy
         const earn = qty * (priceSell - priceBuy);
-        _r.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, sellPrice: priceSell, earn: earn  });
-  
+        if (P > priceBuy) {
+          _r.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: "Wait to buy" });
+        } else {
+          _r.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: "Wait to sell" });
+        }
+
+
       }
 
       setRows(_r);
@@ -66,10 +73,10 @@ export default function GridCard() {
     {
       field: "id",
 
-      width: 120,
+      width: 100,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
-          <div>N.</div>
+          <div style={{ fontWeight: "bold" }}>Grid Id</div>
         </div>
       ),
     },
@@ -79,10 +86,19 @@ export default function GridCard() {
       width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontWeight: "bold" }}>Buy</div>
-          <div>Quantity</div>
+          <div style={{ fontWeight: "bold" }}>Quantity</div>
         </div>
       ),
+      renderCell: (params) => {
+
+        const color = 'black';
+  
+        return (
+          <span style={{ color }}>
+            {params.row.Quantity.toFixed(5)}
+          </span>
+        );
+      },
     },
     {
       field: "buyPrice",
@@ -90,10 +106,39 @@ export default function GridCard() {
       width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontWeight: "bold" }}>Buy</div>
-          <div>Price</div>
+          <div style={{ fontWeight: "bold" }}>Buy Price</div>
         </div>
       ),
+      renderCell: (params) => {
+
+        const color = params.row.status == 'Wait to sell' ? 'green' : 'red';
+  
+        return (
+          <span style={{ color }}>
+            {params.row.buyPrice.toFixed(5)}
+          </span>
+        );
+      },
+    },
+    {
+      field: "capital",
+
+      width: 180,
+      renderHeader: () => (
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontWeight: "bold" }}>Capital Share</div>
+        </div>
+      ),
+      renderCell: (params) => {
+
+        const color = 'black';
+  
+        return (
+          <span style={{ color }}>
+            {params.row.capital.toFixed(2)}
+          </span>
+        );
+      },
     },
     {
       field: "sellPrice",
@@ -101,10 +146,19 @@ export default function GridCard() {
       width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontWeight: "bold" }}>Sell</div>
-          <div>Price</div>
+          <div style={{ fontWeight: "bold" }}>Sell Price</div>
         </div>
       ),
+      renderCell: (params) => {
+
+        const color = params.row.status == 'Wait to sell' ? 'red' : 'black';
+  
+        return (
+          <span style={{ color }}>
+            {params.row.sellPrice.toFixed(5)}
+          </span>
+        );
+      },
     },
     {
       field: "earn",
@@ -112,44 +166,114 @@ export default function GridCard() {
       width: 180,
       renderHeader: () => (
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontWeight: "bold" }}>Earn</div>
+          <div style={{ fontWeight: "bold" }}>Profit</div>
         </div>
       ),
+      renderCell: (params) => {
+
+        const color = 'black';
+  
+        return (
+          <span style={{ color }}>
+            {params.row.earn.toFixed(5)}
+          </span>
+        );
+      },
+    },
+    {
+      field: "status",
+
+      width: 180,
+      renderHeader: () => (
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontWeight: "bold" }}>Status</div>
+        </div>
+      ),
+      renderCell: (params) => {
+
+        const color = 'blue';
+  
+        return (
+          <span style={{ color }}>
+            {params.row.status}
+          </span>
+        );
+      },
     },
 
   ];
 
- 
+
 
 
   const render = function () {
+
     switch (status) {
       case "computed":
+        const investment = parseFloat(inputInvestmentRef.current?.value || '0');
+        let qty = 0;
+        let initInvestent = 0;
+        let saved = 0;
+        let future = 0;
+        const P = parseFloat(inputPRef.current?.value || '0');
+        rows.forEach((el) => {
+          if (P < el.buyPrice) {
+            qty += el.Quantity
+            initInvestent += el.Quantity * P;
+            saved += el.Quantity * (el.buyPrice-P)
+
+          } else {
+            future += el.Quantity * el.buyPrice;
+          }
+        });
+
         return (
-          <Card className="bg-blue-100 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
-            <div className='flex flex-col text-center'>
-              <Typography className="text-blue-900" variant="h5" gutterBottom>
-                Resulting Grids
-              </Typography>
-              <div className='flex flex-row'>
-                <Box className="bg-blue-100" sx={{ height: 400, width: "100%" }}>
-                  <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    sx={{
-                      "& .MuiDataGrid-row:nth-of-type(even)": {
-                        backgroundColor: "whitesmoke", // Righe pari
-                      },
-                      "& .MuiDataGrid-row:nth-of-type(odd)": {
-                        backgroundColor: "white", // Righe dispari
-                      },
-                    }}
-                  />
-                </Box>
+          <div>
+            <Card className="bg-blue-200 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
+              <div className='flex flex-col text-center'>
+                <Typography className="text-blue-900" variant="h5" gutterBottom>
+                  Resulting Grids
+                </Typography>
+                <div className='flex flex-row'>
+                  <Box className="bg-blue-100" sx={{ height: 400, width: "100%" }}>
+                    <DataGrid
+                      rows={rows}
+                      columns={columns}
+                      sx={{
+                        "& .MuiDataGrid-row:nth-of-type(even)": {
+                          backgroundColor: "whitesmoke", // Righe pari
+                        },
+                        "& .MuiDataGrid-row:nth-of-type(odd)": {
+                          backgroundColor: "white", // Righe dispari
+                        },
+                      }}
+                    />
+                  </Box>
+                </div>
               </div>
-            </div>
-          </Card>
-          );
+            </Card>
+            <br></br>
+            <Card className="bg-blue-200 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
+              <div className='flex flex-col text-center'>
+                <Typography className="text-blue-900" variant="h5" gutterBottom>
+                  Summary
+                </Typography>
+                <div className='text-left'>
+                  <p className='text-blue-900'>Total investment: {investment.toFixed(2)} </p>
+                  <br></br>
+                  <p className='text-blue-900'>Initial early buy quantity: {qty.toFixed(5)} </p>
+                  <p className='text-blue-900'>Initial allocation for early buy: {initInvestent.toFixed(2)} </p>
+                  <p className='text-blue-900'>Initial saved allocation: {saved.toFixed(2)} </p>
+                  <br></br>
+                  <p className='text-blue-900'>Reserved allocation for future purchases: {future.toFixed(2)} </p>
+                  <br></br>
+                </div>
+              </div>
+            </Card>
+            <br></br>
+            <br></br>
+          </div>
+        );
 
       default:
         return (<Box></Box>);
@@ -169,7 +293,7 @@ export default function GridCard() {
               className='bg-white rounded-md'
               inputRef={inputInvestmentRef}
               type="number"
-              label="Investment"
+              label="Total Investment"
               fullWidth
               margin="normal"
               slotProps={{
@@ -204,6 +328,17 @@ export default function GridCard() {
             inputRef={inputPbRef}
             type="number"
             label="Final Price"
+            fullWidth
+            margin="normal"
+            slotProps={{
+              inputLabel: { shrink: true },
+            }}
+          />
+          <TextField
+            className='bg-white rounded-md'
+            inputRef={inputPRef}
+            type="number"
+            label="Current Price"
             fullWidth
             margin="normal"
             slotProps={{
@@ -247,7 +382,7 @@ export default function GridCard() {
           variant="filled"
           sx={{ width: '100%' }}
         >
-          Input value wrong
+          Input value are wrong
         </Alert>
       </Snackbar>
 
