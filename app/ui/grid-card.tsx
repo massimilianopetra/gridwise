@@ -8,15 +8,10 @@ import { Box } from "@mui/material";
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-type buyType = {
+type gridType = {
   id: number;
-  buyQuantity: number;
+  Quantity: number;
   buyPrice: number;
-};
-
-type sellType = {
-  id: number;
-  sellQuantity: number;
   sellPrice: number;
   earn: number;
 };
@@ -24,8 +19,7 @@ type sellType = {
 export default function GridCard() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(false);
-  const [rb, setrowsBuy] = useState<buyType[]>([]);
-  const [rs, setrowsSell] = useState<sellType[]>([]);
+  const [rows, setRows] = useState<gridType[]>([]);
   const [status, setStatus] = useState("initial");
   const inputInvestmentRef = useRef<HTMLInputElement>(null);
   const inputCurrencyRef = useRef<HTMLInputElement>(null);
@@ -44,8 +38,7 @@ export default function GridCard() {
     const n = parseFloat(inputNGridRef.current?.value || '0');
 
     const grid_gain = (Pb / Pa) ** (1 / n);
-    var _rb: buyType[] = [];
-    var _rs: sellType[] = [];
+    var _r: gridType[] = [];
 
     // Controllo congruenza parametri
     if (Pa > 0 && Pb > 0 && investment > 0 && n > 2) {
@@ -56,15 +49,11 @@ export default function GridCard() {
         const priceSell = Pa * (grid_gain ** (i + 1));
         const qty = (investment / n) / priceBuy
         const earn = qty * (priceSell - priceBuy);
-        _rb.push({ id: i + 1, buyQuantity: qty, buyPrice: priceBuy });
-        _rs.push({ id: i + 1, sellQuantity: qty, sellPrice: priceSell, earn: earn });
-
+        _r.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, sellPrice: priceSell, earn: earn  });
+  
       }
 
-      ;
-
-      setrowsBuy(_rb);
-      setrowsSell(_rs);
+      setRows(_r);
       setStatus("computed");
     } else {
       setStatus("initial");
@@ -73,7 +62,7 @@ export default function GridCard() {
 
   };
 
-  const columnsBuy: GridColDef[] = [
+  const columns: GridColDef[] = [
     {
       field: "id",
 
@@ -85,7 +74,7 @@ export default function GridCard() {
       ),
     },
     {
-      field: "buyQuantity",
+      field: "Quantity",
 
       width: 180,
       renderHeader: () => (
@@ -103,32 +92,6 @@ export default function GridCard() {
         <div style={{ textAlign: "center" }}>
           <div style={{ fontWeight: "bold" }}>Buy</div>
           <div>Price</div>
-        </div>
-      ),
-    },
-
-
-  ];
-
-  const columnsSell: GridColDef[] = [
-    {
-      field: "id",
-
-      width: 120,
-      renderHeader: () => (
-        <div style={{ textAlign: "center" }}>
-          <div>N.</div>
-        </div>
-      ),
-    },
-    {
-      field: "sellQuantity",
-
-      width: 180,
-      renderHeader: () => (
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontWeight: "bold" }}>Sell</div>
-          <div>Quantity</div>
         </div>
       ),
     },
@@ -153,7 +116,10 @@ export default function GridCard() {
         </div>
       ),
     },
+
   ];
+
+ 
 
 
   const render = function () {
@@ -166,10 +132,10 @@ export default function GridCard() {
                 Resulting Grids
               </Typography>
               <div className='flex flex-row'>
-                <Box className="bg-blue-100" sx={{ height: 400, width: "50%" }}>
+                <Box className="bg-blue-100" sx={{ height: 400, width: "100%" }}>
                   <DataGrid
-                    rows={rb}
-                    columns={columnsBuy}
+                    rows={rows}
+                    columns={columns}
                     sx={{
                       "& .MuiDataGrid-row:nth-of-type(even)": {
                         backgroundColor: "whitesmoke", // Righe pari
@@ -180,20 +146,6 @@ export default function GridCard() {
                     }}
                   />
                 </Box>
-                < Box className="bg-blue-100" sx={{ height: 400, width: "50%" }}>
-                  <DataGrid
-                    rows={rs}
-                    columns={columnsSell}
-                    sx={{
-                      "& .MuiDataGrid-row:nth-of-type(even)": {
-                        backgroundColor: "whitesmoke", // Righe pari
-                      },
-                      "& .MuiDataGrid-row:nth-of-type(odd)": {
-                        backgroundColor: "white", // Righe dispari
-                      },
-                    }}
-                  />
-                </Box >
               </div>
             </div>
           </Card>
