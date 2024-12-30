@@ -30,7 +30,7 @@ export default function LiquidityCard() {
   };
 
   return (
-    <Card className="bg-blue-100 rounded-xl" sx={{ maxWidth: 400, margin: 'auto', padding: 2 }}>
+    <Card sx={{ maxWidth: 400, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0',  borderRadius: '12px', }}>
       <CardContent>
         <Typography className="text-blue-900" variant="h5" gutterBottom>
           Liquidity Computing

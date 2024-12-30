@@ -2,10 +2,8 @@ import Link from 'next/link';
 import NavLinks from '@/app/ui/nav-links';
 import AcmeLogo from '@/app/ui/acme-logo';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
+import { signOut } from '@/auth';
 
-async function signOut() {
-    
-}
 
 export default function SideNav() {
   return (
