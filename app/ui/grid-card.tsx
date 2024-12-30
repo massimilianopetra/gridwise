@@ -229,7 +229,7 @@ export default function GridCard() {
 
         return (
           <div>
-            <Card className="bg-gray-300 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
+            <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0',  borderRadius: '12px',  }}>
               <div className='flex flex-col text-center'>
                 <Typography className="text-blue-900" variant="h5" gutterBottom>
                   Resulting Grids
@@ -253,7 +253,7 @@ export default function GridCard() {
               </div>
             </Card>
             <br></br>
-            <Card className="bg-gray-300 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
+            <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0',  borderRadius: '12px',  }}>
               <div className='flex flex-col text-center'>
                 <Typography className="text-blue-900" variant="h5" gutterBottom>
                   Summary
@@ -283,7 +283,7 @@ export default function GridCard() {
 
   return (
     <div className='space-y-6'>
-      <Card className="bg-gray-300 rounded-xl" sx={{ maxWidth: 400, margin: 'auto', padding: 2 }}>
+      <Card sx={{ maxWidth: 400, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0',  borderRadius: '12px',  }}>
         <CardContent>
           <Typography className="text-blue-900" variant="h5" gutterBottom>
             Grid Calculator
