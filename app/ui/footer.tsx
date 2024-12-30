@@ -5,8 +5,8 @@ export default function Footer() {
 
 
 
-        <div className="text-xs text-white">
-            <p>
+        <div className="text-xs text-balck space-x-5">
+            <p className=''>
                 Disclaimer:
             </p>
             <p>

@@ -229,13 +229,13 @@ export default function GridCard() {
 
         return (
           <div>
-            <Card className="bg-blue-200 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
+            <Card className="bg-gray-300 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
               <div className='flex flex-col text-center'>
                 <Typography className="text-blue-900" variant="h5" gutterBottom>
                   Resulting Grids
                 </Typography>
                 <div className='flex flex-row'>
-                  <Box className="bg-blue-100" sx={{ height: 400, width: "100%" }}>
+                  <Box sx={{ height: 400, width: "100%" }}>
                     <DataGrid
                       rows={rows}
                       columns={columns}
@@ -253,7 +253,7 @@ export default function GridCard() {
               </div>
             </Card>
             <br></br>
-            <Card className="bg-blue-200 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
+            <Card className="bg-gray-300 rounded-xl" sx={{ maxWidth: 1200, margin: 'auto', padding: 2 }}>
               <div className='flex flex-col text-center'>
                 <Typography className="text-blue-900" variant="h5" gutterBottom>
                   Summary
@@ -283,7 +283,7 @@ export default function GridCard() {
 
   return (
     <div className='space-y-6'>
-      <Card className="bg-blue-100 rounded-xl" sx={{ maxWidth: 400, margin: 'auto', padding: 2 }}>
+      <Card className="bg-gray-300 rounded-xl" sx={{ maxWidth: 400, margin: 'auto', padding: 2 }}>
         <CardContent>
           <Typography className="text-blue-900" variant="h5" gutterBottom>
             Grid Calculator

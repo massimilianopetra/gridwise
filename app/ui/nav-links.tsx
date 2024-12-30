@@ -18,9 +18,9 @@ export default function NavLinks() {
     var links = undefined;
 
     
-    links = [{ name: 'Home', href: '/', icon: HomeIcon },
-             { name: 'Liquidity', href: '/liquidity', icon: WaterDropIcon},
-             { name: 'Grid Calculator', href: '/gridcalculator', icon: ViewHeadlineIcon},];
+    links = [{ name: 'Home', href: '/home', icon: HomeIcon },
+             { name: 'Liquidity', href: '/home/liquidity', icon: WaterDropIcon},
+             { name: 'Grid Calculator', href: '/home/gridcalculator', icon: ViewHeadlineIcon},];
 
     return (
         <>

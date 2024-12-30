@@ -9,7 +9,7 @@ async function signOut() {
 
 export default function SideNav() {
   return (
-    <div className="flex h-full flex-col px-3 py-3 lg:px-2 sm:px-2 bg-blue-950">
+    <div className="flex h-full flex-col px-3 py-3 lg:px-2 sm:px-2 bg-gray-300">
       <Link
         className="mb-2 flex h-16 items-end justify-start rounded-sm bg-blue-700 p-4 lg:h-32"
         href="/"
