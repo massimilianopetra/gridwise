@@ -67,7 +67,7 @@ export  function GometricGrid(investment:number, Pa: number, Pb: number, P: numb
     _grid = _grid.map((g) => {
         if (g.status == true) {
 
-                totInvest = g.Quantity * lastPrice;
+                totInvest += g.Quantity * lastPrice;
         } else {
             liquidity = g.Quantity * g.buyPrice;
         }
