@@ -47,7 +47,7 @@ export  function GometricGrid(investment:number, Pa: number, Pb: number, P: numb
             } else {
                 if (e.value > g.sellPrice && g.status == true) {
                     result.push(`${e.label} sell at price ${e.value} grid n. ${g.id}`)
-                    gridprofit += g.earn;
+                    gridprofit += (e.value-g.buyPrice)*g.Quantity;
                     return ({...g,status:false});
                 } else {
                     return ({...g}); 
