@@ -39,6 +39,7 @@ export  function GometricGrid(investment:number, Pa: number, Pb: number, P: numb
     let result = []
     let lastPrice = 0
     let totInvest = 0;
+    let liquidity = 0;
 
     csv.forEach((e) => {
         lastPrice = e.value;
@@ -60,17 +61,21 @@ export  function GometricGrid(investment:number, Pa: number, Pb: number, P: numb
     });
 
     result.push(`----------------------------------`);
-    result.push(`Total grid profit: ${gridprofit}`);
-    result.push(`Total saved capital: ${saved}`);
+    result.push(`Total grid profit: ${gridprofit.toFixed(2)}`);
+    result.push(`Total saved capital: ${saved.toFixed(2)}`);
 
     _grid = _grid.map((g) => {
         if (g.status == true) {
 
                 totInvest = g.Quantity * lastPrice;
+        } else {
+            liquidity = g.Quantity * g.buyPrice;
         }
+
         return ({...g}); 
     });
 
-    result.push(`Total ivested capital: ${totInvest}`);
+    result.push(`Total allocated for next buy: ${liquidity.toFixed(2)}`);
+    result.push(`Total ivested capital: ${totInvest.toFixed(2)}`);
     return(result);
   }
