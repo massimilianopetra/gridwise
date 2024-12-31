@@ -19,7 +19,7 @@ export default function Page() {
 
   const [selected, setSelected] = useState(false);
   const [rows, setRows] = useState<GridType[]>([]);
-  const [rawData, setRawData] = useState<string>([]);
+  const [rawData, setRawData] = useState<string>("");
   const [status, setStatus] = useState("initial");
   const inputInvestmentRef = useRef<HTMLInputElement>(null);
   const inputCurrencyRef = useRef<HTMLInputElement>(null);
