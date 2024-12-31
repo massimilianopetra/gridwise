@@ -6,3 +6,13 @@ export type DbUser = {
   email: string;
   password: string;
 };
+
+export type GridType = {
+  id: number;
+  Quantity: number;
+  buyPrice: number;
+  capital: number;
+  sellPrice: number;
+  earn: number;
+  status: boolean;
+};
