@@ -69,7 +69,7 @@ export  function GometricGrid(investment:number, Pa: number, Pb: number, P: numb
 
                 totInvest += g.Quantity * lastPrice;
         } else {
-            liquidity = g.Quantity * g.buyPrice;
+            liquidity += g.Quantity * g.buyPrice;
         }
 
         return ({...g}); 
