@@ -16,3 +16,8 @@ export type GridType = {
   earn: number;
   status: boolean;
 };
+
+export type StockData = {
+  time: string,
+  value: number
+}

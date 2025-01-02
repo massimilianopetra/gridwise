@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { Card, Typography, Button } from '@mui/material';
+import { StockData } from '@/app/lib/definitions'
 
-interface Row {
-    label: string;
-    value: number;
-}
 
 interface CsvFileReaderProps {
-    onFileLoad: (rows: Row[]) => void;
+    onFileLoad: (rows: StockData[]) => void;
 }
 
 const CsvFileReader: React.FC<CsvFileReaderProps> = ({ onFileLoad }) => {
@@ -22,15 +19,15 @@ const CsvFileReader: React.FC<CsvFileReaderProps> = ({ onFileLoad }) => {
         reader.onload = (e) => {
             const text = e.target?.result as string;
             try {
-                const parsedRows: Row[] = text.split("\n").map((line, index) => {
-                    const [label, value] = line.split(";");
+                const parsedRows: StockData[] = text.split("\n").map((line, index) => {
+                    const [time, value] = line.split(";");
                     //console.log(`label: ${label} value: ${value}`);
 
-                    if (!label || isNaN(Number(value))) {
+                    if (!time || isNaN(Number(value))) {
                         throw new Error(`Error at line ${index + 1}: invalid format.`);
                     }
 
-                    return { label: label.trim(), value: parseFloat(value.trim()) };
+                    return { time: time.trim(), value: parseFloat(value.trim()) };
                 });
 
                 setError(null);

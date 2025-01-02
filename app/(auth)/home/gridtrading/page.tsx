@@ -12,13 +12,17 @@ import GridTable from '@/app/ui/grid-table';
 import GridSummary from '@/app/ui/grid-summary';
 import { GometricGrid } from '@/app/lib/algorithm';
 import CsvFileReader from '@/app/ui/CsvFileReader';
-import { GridBackTesting } from '@/app/lib/algorithm';
+import { GridBackTesting, HoldStrategy } from '@/app/lib/algorithm';
+import { StockData } from '@/app/lib/definitions'
+import TradingChart from '@/app/ui/TradingChart';
 
 export default function Page() {
   const [open, setOpen] = useState(false);
 
   const [selected, setSelected] = useState(false);
   const [rows, setRows] = useState<GridType[]>([]);
+  const [holdstrategy, setSetHoldstrategy] = useState<StockData[]>([]);
+  const [gridstrategy, setSetGridstrategy] = useState<StockData[]>([]);
   const [rawData, setRawData] = useState<string>("");
   const [status, setStatus] = useState("initial");
   const inputInvestmentRef = useRef<HTMLInputElement>(null);
@@ -50,13 +54,11 @@ export default function Page() {
 
   };
 
-  interface Row {
-    label: string;
-    value: number;
-  }
 
-  const handleFileLoad = (items: Row[]) => {
+  const handleFileLoad = (items: StockData[]) => {
     const result = GridBackTesting(rows, items);
+
+    setSetHoldstrategy(HoldStrategy(rows,items));
     setRawData(result.join("\n"));
   };
 
@@ -77,6 +79,7 @@ export default function Page() {
             <div className='text-center'>
               <CsvFileReader onFileLoad={handleFileLoad} />
             </div>
+            <br></br>
             <Card>
               <TextField
                 label="Test Result"
@@ -88,6 +91,17 @@ export default function Page() {
                 className="mt-4"
               />
             </Card>
+            <br></br>
+            <Card>
+              {/* Imposta larghezza per il contenitore del grafico */}
+              <TradingChart
+                series={[
+                  { data: holdstrategy, color: '#4caf50', title: 'Hold Strategy' },
+                ]}
+                className="bg-gray-800"
+              />
+            </Card>
+
             <br></br>
           </div>
         );
