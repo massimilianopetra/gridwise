@@ -54,6 +54,46 @@ export function HoldStrategy(grid: GridType[], csv: StockData[]): StockData[] {
     return h;
 }
 
+export function GridStrategy(grid: GridType[], csv: StockData[]): StockData[] {
+    let gridprofit = 0;
+    let saved = 0;
+    let _grid = grid;
+    let totInvest = 0;
+    let liquidity = 0;
+
+    const result = csv.map((e) => {
+        _grid = _grid.map((g) => {
+            if (e.value < g.buyPrice && g.status == false) {
+                saved += (g.buyPrice - e.value) * g.Quantity;
+                return ({ ...g, status: true });
+            } else {
+                if (e.value > g.sellPrice && g.status == true) {
+                    gridprofit += (e.value - g.buyPrice) * g.Quantity;
+                    return ({ ...g, status: false });
+                } else {
+                    return ({ ...g });
+                }
+            }
+        });
+
+        totInvest = 0;
+        liquidity = 0;
+        _grid.forEach((g) => {
+            if (g.status == true) {
+    
+                totInvest += g.Quantity * e.value;
+            } else {
+                liquidity += g.Quantity * g.buyPrice;
+            }
+    
+        });
+
+        return({time: e.time, value: totInvest+liquidity+gridprofit+saved});
+    });
+
+    return (result);
+}
+
 export function GridBackTesting(grid: GridType[], csv: StockData[]): string[] {
     let gridprofit = 0;
     let saved = 0;

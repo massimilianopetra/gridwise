@@ -12,7 +12,7 @@ import GridTable from '@/app/ui/grid-table';
 import GridSummary from '@/app/ui/grid-summary';
 import { GometricGrid } from '@/app/lib/algorithm';
 import CsvFileReader from '@/app/ui/CsvFileReader';
-import { GridBackTesting, HoldStrategy } from '@/app/lib/algorithm';
+import { GridBackTesting, HoldStrategy, GridStrategy } from '@/app/lib/algorithm';
 import { StockData } from '@/app/lib/definitions'
 import TradingChart from '@/app/ui/TradingChart';
 
@@ -59,6 +59,8 @@ export default function Page() {
     const result = GridBackTesting(rows, items);
 
     setSetHoldstrategy(HoldStrategy(rows,items));
+    setSetGridstrategy(GridStrategy(rows,items));
+
     setRawData(result.join("\n"));
   };
 
@@ -97,6 +99,7 @@ export default function Page() {
               <TradingChart
                 series={[
                   { data: holdstrategy, color: '#4caf50', title: 'Hold Strategy' },
+                  { data: gridstrategy, color: '#f44336', title: 'Grid Strategy' },
                 ]}
                 className="bg-gray-800"
               />

@@ -48,7 +48,7 @@ const TradingChart: React.FC<TradingChartProps> = ({ series, className }) => {
       const lineSeries = chart.addLineSeries({
         color,
         lineWidth: 2,
-        priceScaleId: index === 0 ? 'right' : 'left', // Usa asse Y separato per la seconda serie
+        //priceScaleId: index === 0 ? 'right' : 'left', // Usa asse Y separato per la seconda serie
       });
       lineSeries.setData(data);
 
