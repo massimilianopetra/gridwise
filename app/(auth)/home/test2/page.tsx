@@ -25,4 +25,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;s
+export default Home;
