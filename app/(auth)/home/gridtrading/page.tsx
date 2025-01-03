@@ -64,6 +64,7 @@ export default function Page() {
     setViewgraph(true);
 
     //setRawData(result.join("\n"));
+    console.log(result.join("\n"));
   };
 
   const render = function () {
