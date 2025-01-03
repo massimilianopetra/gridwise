@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useRef, useState } from 'react';
-import { Card, CardContent, CardActions, TextField, Typography, Button } from '@mui/material';
+import { Card, CardContent, CardActions, TextField, Typography, Button, FormControlLabel } from '@mui/material';
 import Switch from '@mui/material/Switch';
 import { Box } from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
@@ -20,11 +20,13 @@ export default function Page() {
   const [open, setOpen] = useState(false);
 
   const [selected, setSelected] = useState(false);
-  const [viewgraph, setViewgraph] = useState(false);
+  const [viewGraph, setViewgraph] = useState(false);
+  const [isGraphPercentage, setIsGraphPercentage] = useState(false);
   const [rows, setRows] = useState<GridType[]>([]);
   const [holdstrategy, setSetHoldstrategy] = useState<StockData[]>([]);
   const [gridstrategy, setSetGridstrategy] = useState<StockData[]>([]);
-  const [rawData, setRawData] = useState<string>("");
+  const [holdstrategy_graph, setSetHoldstrategy_graph] = useState<StockData[]>([]);
+  const [gridstrategy_graph, setSetGridstrategy_graph] = useState<StockData[]>([]);
   const [status, setStatus] = useState("initial");
   const inputInvestmentRef = useRef<HTMLInputElement>(null);
   const inputCurrencyRef = useRef<HTMLInputElement>(null);
@@ -36,6 +38,7 @@ export default function Page() {
 
   const handleCalculation = () => {
     setStatus("computing");
+    setViewgraph(false);
     const investment = parseFloat(inputInvestmentRef.current?.value || '0');
     const Pa = parseFloat(inputPaRef.current?.value || '0');
     const Pb = parseFloat(inputPbRef.current?.value || '0');
@@ -58,13 +61,38 @@ export default function Page() {
 
   const handleFileLoad = (items: StockData[]) => {
     const result = GridBackTesting(rows, items);
-
-    setSetHoldstrategy(HoldStrategy(rows, items));
-    setSetGridstrategy(GridStrategy(rows, items));
+    const h = HoldStrategy(rows, items);
+    const g = GridStrategy(rows, items);
+    setSetHoldstrategy(h);
+    setSetGridstrategy(g);
+    setSetHoldstrategy_graph(h);
+    setSetGridstrategy_graph(g);
     setViewgraph(true);
 
     //setRawData(result.join("\n"));
     console.log(result.join("\n"));
+  };
+
+  const handleToggleIsGraphPercentage = () => {
+    setIsGraphPercentage((prev) => {
+      if (prev) {
+        /* absolute */
+        setSetHoldstrategy_graph(holdstrategy);
+        setSetGridstrategy_graph(gridstrategy);
+        return false;
+      } else {
+        const h = holdstrategy.map((item) => {
+          return({...item, value: 100*(item.value-holdstrategy[0].value)/holdstrategy[0].value})
+        })
+        const g = gridstrategy.map((item) => {
+          return({...item, value: 100*(item.value-gridstrategy[0].value)/gridstrategy[0].value})
+        })
+        setSetHoldstrategy_graph(h);
+        setSetGridstrategy_graph(g);
+        return true;
+      }
+    });
+
   };
 
   const render = function () {
@@ -91,15 +119,25 @@ export default function Page() {
 
               <br></br>
 
-              {viewgraph ?
-                <TradingChart
-                  series={[
-                    { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
-                    { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
-                  ]}
-                  className="bg-gray-800"
-                /> : <></>
-              }
+              <div>
+                {viewGraph && (
+                  <>
+                    <div className="flex justify-between items-center mb-2">
+                      <FormControlLabel
+                        control={<Switch checked={isGraphPercentage} onChange={handleToggleIsGraphPercentage} />}
+                        label={isGraphPercentage ? 'Percentage Value' : 'Absolute Value'}
+                      />
+                    </div>
+                    <TradingChart
+                      series={[
+                        { data: holdstrategy_graph, color: '#f44336', title: 'Hold Strategy' },
+                        { data: gridstrategy_graph, color: '#4caf50', title: 'Grid Strategy' },
+                      ]}
+                      className="bg-gray-800"
+                    />
+                  </>
+                )}
+              </div>
             </Card>
             <br></br>
             <Card>
