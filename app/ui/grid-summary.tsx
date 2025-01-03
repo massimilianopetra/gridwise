@@ -25,7 +25,7 @@ export default function GridSummary({ rows,investment,P }: { rows: GridType[],in
         <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
             <div className='flex flex-col text-center'>
                 <Typography className="text-blue-900" variant="h5" gutterBottom>
-                    Grid Summary
+                    Investment Summary
                 </Typography>
                 <div className='text-left'>
                     <p className='text-blue-900'>Total investment: {investment.toFixed(2)} </p>

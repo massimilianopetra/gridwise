@@ -20,6 +20,7 @@ export default function Page() {
   const [open, setOpen] = useState(false);
 
   const [selected, setSelected] = useState(false);
+  const [viewgraph, setViewgraph] = useState(false);
   const [rows, setRows] = useState<GridType[]>([]);
   const [holdstrategy, setSetHoldstrategy] = useState<StockData[]>([]);
   const [gridstrategy, setSetGridstrategy] = useState<StockData[]>([]);
@@ -58,10 +59,11 @@ export default function Page() {
   const handleFileLoad = (items: StockData[]) => {
     const result = GridBackTesting(rows, items);
 
-    setSetHoldstrategy(HoldStrategy(rows,items));
-    setSetGridstrategy(GridStrategy(rows,items));
+    setSetHoldstrategy(HoldStrategy(rows, items));
+    setSetGridstrategy(GridStrategy(rows, items));
+    setViewgraph(true);
 
-    setRawData(result.join("\n"));
+    //setRawData(result.join("\n"));
   };
 
   const render = function () {
@@ -78,12 +80,29 @@ export default function Page() {
             <br></br>
             <GridSummary rows={rows} investment={investment} P={P} />
             <br></br>
-            <div className='text-center'>
+            <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
+              <Typography className="text-blue-900 text-center" variant="h5" gutterBottom>
+                Investment Backtesting
+              </Typography>
+
+
               <CsvFileReader onFileLoad={handleFileLoad} />
-            </div>
+
+              <br></br>
+
+              {viewgraph ?
+                <TradingChart
+                  series={[
+                    { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
+                    { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
+                  ]}
+                  className="bg-gray-800"
+                /> : <></>
+              }
+            </Card>
             <br></br>
             <Card>
-              <TextField
+              {/*<TextField
                 label="Test Result"
                 multiline
                 rows={10}
@@ -91,22 +110,10 @@ export default function Page() {
                 variant="outlined"
                 fullWidth
                 className="mt-4"
-              />
-            </Card>
-            <br></br>
-            <Card>
-              {/* Imposta larghezza per il contenitore del grafico */}
-              <TradingChart
-                series={[
-                  { data: holdstrategy, color: '#4caf50', title: 'Hold Strategy' },
-                  { data: gridstrategy, color: '#f44336', title: 'Grid Strategy' },
-                ]}
-                className="bg-gray-800"
-              />
+              />*/}
             </Card>
 
-            <br></br>
-          </div>
+          </div >
         );
 
       default:

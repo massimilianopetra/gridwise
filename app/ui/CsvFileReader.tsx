@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Typography, Button } from '@mui/material';
+import { Typography, Button, TextField } from '@mui/material';
 import { StockData } from '@/app/lib/definitions'
 
 
@@ -9,10 +9,18 @@ interface CsvFileReaderProps {
 
 const CsvFileReader: React.FC<CsvFileReaderProps> = ({ onFileLoad }) => {
     const [error, setError] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<string | null>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (!file) return;
+        if (file) {
+            setSelectedFile(file.name);
+            setError(null); // Reset error
+        } else {
+            setSelectedFile(null);
+            setError("No file selected!");
+            return;
+        }
 
         const reader = new FileReader();
 
@@ -45,25 +53,41 @@ const CsvFileReader: React.FC<CsvFileReaderProps> = ({ onFileLoad }) => {
     };
 
     return (
-        <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
-            <Typography className="text-blue-900" variant="h5" gutterBottom>
-                Load CSV for Backtesting
-            </Typography>
-            <Button
-                variant="contained"
-                component="label"
-                className="mb-4"
-            >
-                Choose File
-                <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileChange}
-                    hidden
+
+        <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="contained"
+                    component="label"
+                    className="mb-4 h-12"
+                >
+                    Choose File
+                    <input
+                        type="file"
+                        accept=".csv"
+                        onChange={handleFileChange}
+                        hidden
+                    />
+                </Button>
+                <TextField
+                    value={selectedFile || ""}
+                    placeholder="No file chosen"
+                    variant="outlined"
+                    InputProps={{
+                        readOnly: true,
+                    }}
+                    className="h-12 bg-white w-64"
+                    sx={{
+                        "& .MuiOutlinedInput-root": {
+                            height: "3rem", // Uniforma l'altezza (circa 48px)
+                            backgroundColor: "white", // Sfondo bianco
+                        },
+                    }}
                 />
-            </Button>
+            </div>
             {error && <Typography color="error">{error}</Typography>}
-        </Card>
+        </div>
+
     );
 };
 
