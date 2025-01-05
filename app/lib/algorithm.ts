@@ -1,4 +1,4 @@
-import { GridType, StockData } from '@/app/lib/definitions';
+import { GridType, StockData, FlagSectionData } from '@/app/lib/definitions';
 
 export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number): GridType[] {
 
@@ -36,25 +36,33 @@ export function HoldStrategy(grid: GridType[], csv: StockData[]): StockData[] {
     const currentprice = csv[0].value;
 
     grid.forEach((item) => {
-      if (currentprice < item.buyPrice) {
-        qty += item.Quantity
-        initInvestent += item.Quantity * currentprice;
-        saved += item.Quantity * (item.buyPrice - currentprice)
+        if (currentprice < item.buyPrice) {
+            qty += item.Quantity
+            initInvestent += item.Quantity * currentprice;
+            saved += item.Quantity * (item.buyPrice - currentprice)
 
-      } else {
-        future += item.Quantity * item.buyPrice;
-      }
+        } else {
+            future += item.Quantity * item.buyPrice;
+        }
     });
 
-    const quota = (initInvestent+future)/currentprice
+    const quota = (initInvestent + future) / currentprice
     const h = csv.map(item => {
-        return ({ ...item, value: item.value*quota});
+        return ({ ...item, value: item.value * quota });
     });
 
     return h;
 }
 
-export function GridStrategy(grid: GridType[], csv: StockData[]): StockData[] {
+export function GridStrategy(
+    grid: GridType[],
+    csv: StockData[],
+    flags: FlagSectionData = {
+        buyOnGrid: false,
+        sellOnGrid: false,
+        commissionPercentage: "0",
+        fixedCommission: "0",
+    }): StockData[] {
     let gridprofit = 0;
     let saved = 0;
     let _grid = grid;
@@ -64,11 +72,13 @@ export function GridStrategy(grid: GridType[], csv: StockData[]): StockData[] {
     const result = csv.map((e) => {
         _grid = _grid.map((g) => {
             if (e.value < g.buyPrice && g.status == false) {
-                saved += (g.buyPrice - e.value) * g.Quantity;
+                const price = flags.buyOnGrid ? g.buyPrice : e.value;
+                saved += (g.buyPrice - price) * g.Quantity;
                 return ({ ...g, status: true });
             } else {
                 if (e.value > g.sellPrice && g.status == true) {
-                    gridprofit += (e.value - g.buyPrice) * g.Quantity;
+                    const price = flags.sellOnGrid ? g.sellPrice : e.value;
+                    gridprofit += (price - g.buyPrice) * g.Quantity;
                     return ({ ...g, status: false });
                 } else {
                     return ({ ...g });
@@ -80,21 +90,29 @@ export function GridStrategy(grid: GridType[], csv: StockData[]): StockData[] {
         liquidity = 0;
         _grid.forEach((g) => {
             if (g.status == true) {
-    
+
                 totInvest += g.Quantity * e.value;
             } else {
                 liquidity += g.Quantity * g.buyPrice;
             }
-    
+
         });
 
-        return({time: e.time, value: totInvest+liquidity+gridprofit+saved});
+        return ({ time: e.time, value: totInvest + liquidity + gridprofit + saved });
     });
 
     return (result);
 }
 
-export function GridBackTesting(grid: GridType[], csv: StockData[]): string[] {
+export function GridBackTesting(
+    grid: GridType[],
+    csv: StockData[],
+    flags: FlagSectionData = {
+        buyOnGrid: false,
+        sellOnGrid: false,
+        commissionPercentage: "0",
+        fixedCommission: "0",
+    }): string[] {
     let gridprofit = 0;
     let saved = 0;
     let _grid = grid;
@@ -107,13 +125,15 @@ export function GridBackTesting(grid: GridType[], csv: StockData[]): string[] {
         lastPrice = e.value;
         _grid = _grid.map((g) => {
             if (e.value < g.buyPrice && g.status == false) {
-                result.push(`${e.time} buy at price ${e.value} grid n. ${g.id}`);
-                saved += (g.buyPrice - e.value) * g.Quantity;
+                const price = flags.buyOnGrid ? g.buyPrice : e.value;
+                result.push(`${e.time} buy at price ${price} grid n. ${g.id}`);
+                saved += (g.buyPrice - price) * g.Quantity;
                 return ({ ...g, status: true });
             } else {
+                const price = flags.sellOnGrid ? g.sellPrice : e.value;
                 if (e.value > g.sellPrice && g.status == true) {
-                    result.push(`${e.time} sell at price ${e.value} grid n. ${g.id}`)
-                    gridprofit += (e.value - g.buyPrice) * g.Quantity;
+                    result.push(`${e.time} sell at price ${price} grid n. ${g.id}`)
+                    gridprofit += (price - g.buyPrice) * g.Quantity;
                     return ({ ...g, status: false });
                 } else {
                     return ({ ...g });

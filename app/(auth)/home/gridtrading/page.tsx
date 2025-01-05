@@ -15,6 +15,7 @@ import CsvFileReader from '@/app/ui/CsvFileReader';
 import { GridBackTesting, HoldStrategy, GridStrategy } from '@/app/lib/algorithm';
 import { StockData } from '@/app/lib/definitions'
 import TradingChart from '@/app/ui/TradingChart';
+import FlagSection from '@/app/ui/FlagSection';
 
 export default function Page() {
   const [open, setOpen] = useState(false);
@@ -34,6 +35,12 @@ export default function Page() {
   const inputPbRef = useRef<HTMLInputElement>(null);
   const inputPRef = useRef<HTMLInputElement>(null);
   const inputNGridRef = useRef<HTMLInputElement>(null);
+  const [flags, setFlags] = useState({
+    buyOnGrid: false,
+    sellOnGrid: false,
+    commissionPercentage: "0",
+    fixedCommission: "0",
+  });
 
 
   const handleCalculation = () => {
@@ -60,9 +67,9 @@ export default function Page() {
 
 
   const handleFileLoad = (items: StockData[]) => {
-    const result = GridBackTesting(rows, items);
+    const result = GridBackTesting(rows, items, flags);
     const h = HoldStrategy(rows, items);
-    const g = GridStrategy(rows, items);
+    const g = GridStrategy(rows, items, flags);
     setSetHoldstrategy(h);
     setSetGridstrategy(g);
     setSetHoldstrategy_graph(h);
@@ -82,10 +89,10 @@ export default function Page() {
         return false;
       } else {
         const h = holdstrategy.map((item) => {
-          return({...item, value: 100*(item.value-holdstrategy[0].value)/holdstrategy[0].value})
+          return ({ ...item, value: 100 * (item.value - holdstrategy[0].value) / holdstrategy[0].value })
         })
         const g = gridstrategy.map((item) => {
-          return({...item, value: 100*(item.value-gridstrategy[0].value)/gridstrategy[0].value})
+          return ({ ...item, value: 100 * (item.value - gridstrategy[0].value) / gridstrategy[0].value })
         })
         setSetHoldstrategy_graph(h);
         setSetGridstrategy_graph(g);
@@ -93,6 +100,14 @@ export default function Page() {
       }
     });
 
+  };
+
+  const handleFlagsChange = (updatedFlags: { buyOnGrid: boolean; sellOnGrid: boolean }) => {
+    setFlags((prev) => ({ ...prev, ...updatedFlags }));
+  };
+
+  const handleCommissionChange = (data: { commissionPercentage: string; fixedCommission: string }) => {
+    setFlags((prev) => ({ ...prev, ...data }));
   };
 
   const render = function () {
@@ -116,6 +131,9 @@ export default function Page() {
 
 
               <CsvFileReader onFileLoad={handleFileLoad} />
+              <FlagSection onFlagsChange={handleFlagsChange} onCommissionChange={handleCommissionChange} />
+
+
 
               <br></br>
 

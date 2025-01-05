@@ -21,3 +21,10 @@ export type StockData = {
   time: string,
   value: number
 }
+
+export interface FlagSectionData {
+  buyOnGrid: boolean;
+  sellOnGrid: boolean;
+  commissionPercentage: string;
+  fixedCommission: string;
+}
