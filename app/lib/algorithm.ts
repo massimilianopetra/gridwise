@@ -1,6 +1,25 @@
+/*
+ * This file is part of the project by Massimiliano Petra.
+ *
+ * Copyright (C) 2025 Massimiliano Petra
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import { GridType, StockData, FlagSectionData } from '@/app/lib/definitions';
 
-export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number): GridType[] {
+export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number): GridType[] {
 
     const grid_gain = (Pb / Pa) ** (1 / n);
     var result: GridType[] = [];
@@ -8,19 +27,37 @@ export function GometricGrid(investment: number, Pa: number, Pb: number, P: numb
     // Controllo congruenza parametri
     if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {
 
-        for (let i = 0; i < n; i++) {
 
-            const priceBuy = Pa * (grid_gain ** i);
-            const priceSell = Pa * (grid_gain ** (i + 1));
-            const qty = (investment / n) / priceBuy
-            const earn = qty * (priceSell - priceBuy);
-            if (P > priceBuy) {
-                result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: false });
+        for (let iteration = 0; iteration < niteration; iteration++) {
+            const local_result: GridType[] = [];
+            var saved = 0;
+            for (let i = 0; i < n; i++) {
+
+                const priceBuy = Pa * (grid_gain ** i);
+                const priceSell = Pa * (grid_gain ** (i + 1));
+                const qty = (investment / n) / priceBuy
+                const earn = qty * (priceSell - priceBuy);
+                if (P > priceBuy) {
+                    local_result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: false });
+                } else {
+                    local_result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: true });
+                    saved += (priceBuy - P) * qty;
+                }
+            }
+            investment = saved
+            if (iteration == 0) {
+                for (let i = 0; i < n; i++) {
+                    result.push(local_result[i]);
+                }
             } else {
-                result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: true });
+                for (let i = 0; i < n; i++) {
+                    result[i] = { ...result[i],
+                        Quantity: result[i].Quantity+local_result[i].Quantity, 
+                        capital: result[i].capital+local_result[i].capital, 
+                        earn:result[i].earn+local_result[i].earn  }
+                }
             }
         }
-
         return (result);
     } else {
         return ([]);

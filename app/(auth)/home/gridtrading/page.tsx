@@ -1,5 +1,24 @@
 'use client'
 
+/*
+ * This file is part of the project by Massimiliano Petra.
+ *
+ * Copyright (C) 2025 Massimiliano Petra
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import React, { useRef, useState } from 'react';
 import { Card, CardContent, CardActions, TextField, Typography, Button, FormControlLabel } from '@mui/material';
 import Switch from '@mui/material/Switch';
@@ -20,7 +39,7 @@ import FlagSection from '@/app/ui/FlagSection';
 export default function Page() {
   const [open, setOpen] = useState(false);
 
-  const [selected, setSelected] = useState(false);
+  const [selPercentage, setSelPercentage] = useState(false);
   const [viewGraph, setViewgraph] = useState(false);
   const [isGraphPercentage, setIsGraphPercentage] = useState(false);
   const [rows, setRows] = useState<GridType[]>([]);
@@ -30,11 +49,11 @@ export default function Page() {
   const [gridstrategy_graph, setSetGridstrategy_graph] = useState<StockData[]>([]);
   const [status, setStatus] = useState("initial");
   const inputInvestmentRef = useRef<HTMLInputElement>(null);
-  const inputCurrencyRef = useRef<HTMLInputElement>(null);
   const inputPaRef = useRef<HTMLInputElement>(null);
   const inputPbRef = useRef<HTMLInputElement>(null);
   const inputPRef = useRef<HTMLInputElement>(null);
   const inputNGridRef = useRef<HTMLInputElement>(null);
+  const inputNIterationRef = useRef<HTMLInputElement>(null);
   const [flags, setFlags] = useState({
     buyOnGrid: false,
     sellOnGrid: false,
@@ -51,11 +70,12 @@ export default function Page() {
     const Pb = parseFloat(inputPbRef.current?.value || '0');
     const P = parseFloat(inputPRef.current?.value || '0');
     const n = parseFloat(inputNGridRef.current?.value || '0');
+    const iteration =  parseFloat(inputNIterationRef.current?.value || '1');
 
     // Controllo congruenza parametri
     if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {
 
-      const grid = GometricGrid(investment, Pa, Pb, P, n);
+      const grid = GometricGrid(investment, Pa, Pb, P, n, iteration);
       setRows(grid);
       setStatus("computed");
     } else {
@@ -131,6 +151,7 @@ export default function Page() {
 
 
               <CsvFileReader onFileLoad={handleFileLoad} />
+              <br></br>
               <FlagSection onFlagsChange={handleFlagsChange} onCommissionChange={handleCommissionChange} />
 
 
@@ -184,10 +205,10 @@ export default function Page() {
 
       <br></br>
       <div className='space-y-6'>
-        <Card sx={{ maxWidth: 400, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
+        <Card sx={{ maxWidth: 600, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
           <CardContent>
             <Typography className="text-blue-900" variant="h5" gutterBottom>
-              Grid Calculator
+              Grid Parameter
             </Typography>
             <div className='flex flex-row space-x-4'>
               <TextField
@@ -203,9 +224,9 @@ export default function Page() {
               />
               <TextField
                 className='bg-white rounded-md'
-                inputRef={inputCurrencyRef}
-                value="USDC"
-                label="Currency"
+                inputRef={inputPRef}
+                type="number"
+                label="Current Price"
                 fullWidth
                 margin="normal"
                 slotProps={{
@@ -213,59 +234,61 @@ export default function Page() {
                 }}
               />
             </div>
-            <TextField
-              className='bg-white rounded-md'
-              inputRef={inputPaRef}
-              type="number"
-              label="Initial Price"
-              fullWidth
-              margin="normal"
-              slotProps={{
-                inputLabel: { shrink: true },
-              }}
-            />
-            <TextField
-              className='bg-white rounded-md'
-              inputRef={inputPbRef}
-              type="number"
-              label="Final Price"
-              fullWidth
-              margin="normal"
-              slotProps={{
-                inputLabel: { shrink: true },
-              }}
-            />
-            <TextField
-              className='bg-white rounded-md'
-              inputRef={inputPRef}
-              type="number"
-              label="Current Price"
-              fullWidth
-              margin="normal"
-              slotProps={{
-                inputLabel: { shrink: true },
-              }}
-            />
-            <TextField
-              className='bg-white rounded-md'
-              inputRef={inputNGridRef}
-              type="number"
+            <div className='flex flex-row space-x-4'>
+              <TextField
+                className='bg-white rounded-md'
+                inputRef={inputPaRef}
+                type="number"
+                label="Initial Price"
+                fullWidth
+                margin="normal"
+                slotProps={{
+                  inputLabel: { shrink: true },
+                }}
+              />
+              <TextField
+                className='bg-white rounded-md'
+                inputRef={inputPbRef}
+                type="number"
+                label="Final Price"
+                fullWidth
+                margin="normal"
+                slotProps={{
+                  inputLabel: { shrink: true },
+                }}
+              />
+            </div>
+            <div className='flex flex-row space-x-4'>
+              <TextField
+                className='bg-white rounded-md max-w-28'
+                inputRef={inputNGridRef}
+                type="number"
 
-              label={selected ? "Percentage" : "Number of Grid"}
-              slotProps={{
-                inputLabel: { shrink: true },
-              }}
-              fullWidth
-              margin="normal"
-            />
-
-
-            <Switch
-              checked={selected}
-              onChange={() => setSelected((prevSelected) => !prevSelected)}
-            >
-            </Switch>
-            <p>use grid percentage</p>
+                label={selPercentage ? "Percentage" : "Number of Grid"}
+                slotProps={{
+                  inputLabel: { shrink: true },
+                }}
+                fullWidth
+                margin="normal"
+              />
+              <FormControlLabel
+                control={<Switch checked={selPercentage} onChange={() => setSelPercentage((prevSelected) => !prevSelected)} />}
+                label={selPercentage ? 'Percentage' : 'N.Grid'}
+              />
+            </div>
+            <div className='flex flex-row space-x-4'>
+              <TextField
+                className='bg-white rounded-md max-w-36'
+                inputRef={inputNIterationRef}
+                type="number"
+                label={"Engine Iteration"}
+                slotProps={{
+                  inputLabel: { shrink: true },
+                }}
+                fullWidth
+                margin="normal"
+              />
+            </div>
           </CardContent>
           <CardActions>
             <Button variant="contained" color="primary" onClick={handleCalculation}>
@@ -289,7 +312,7 @@ export default function Page() {
 
       </div>
 
-    </div>
+    </div >
   );
 };
 
