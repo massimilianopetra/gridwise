@@ -1,10 +1,13 @@
-import LiquidityCard from '@/app/ui/liquidity-card';
+
 
 export default function Home() {
   return (
     <div style={{ height: 250, width: '100%' }}>
       <main>
+
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
+
+          <br></br>
           <div className="max-w-4xl bg-white rounded-lg shadow-md p-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-6">What is Grid Trading?</h1>
             <p className="text-gray-700 text-lg mb-4">
