@@ -36,10 +36,15 @@ import { StockData } from '@/app/lib/definitions'
 import TradingChart from '@/app/ui/TradingChart';
 import FlagSection from '@/app/ui/FlagSection';
 
+interface ISummary {
+  profitableTrades: number,
+  gridProfit: number
+}
 export default function Page() {
   const [open, setOpen] = useState(false);
 
   const [selPercentage, setSelPercentage] = useState(false);
+  const [summary, setSummary] = useState<ISummary>();
   const [viewGraph, setViewgraph] = useState(false);
   const [isGraphPercentage, setIsGraphPercentage] = useState(false);
   const [rows, setRows] = useState<GridType[]>([]);
@@ -70,7 +75,7 @@ export default function Page() {
     const Pb = parseFloat(inputPbRef.current?.value || '0');
     const P = parseFloat(inputPRef.current?.value || '0');
     const n = parseFloat(inputNGridRef.current?.value || '0');
-    const iteration =  parseFloat(inputNIterationRef.current?.value || '1');
+    const iteration = parseFloat(inputNIterationRef.current?.value || '1');
 
     // Controllo congruenza parametri
     if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {
@@ -90,10 +95,11 @@ export default function Page() {
     const result = GridBackTesting(rows, items, flags);
     const h = HoldStrategy(rows, items);
     const g = GridStrategy(rows, items, flags);
-    setSetHoldstrategy(h);
-    setSetGridstrategy(g);
-    setSetHoldstrategy_graph(h);
-    setSetGridstrategy_graph(g);
+    setSetHoldstrategy(h.stockdata);
+    setSetGridstrategy(g.stockdata);
+    setSummary(g.summary)
+    setSetHoldstrategy_graph(h.stockdata);
+    setSetGridstrategy_graph(g.stockdata);
     setViewgraph(true);
 
     //setRawData(result.join("\n"));
@@ -156,6 +162,16 @@ export default function Page() {
 
 
 
+              <br></br>
+              {viewGraph &&
+                (<>
+                  <p>Initial Capital: {gridstrategy[0].value.toFixed(2)} </p>
+                  <p>Final Capital: {gridstrategy[gridstrategy.length - 1].value .toFixed(2)} </p>
+                  <p>Strategy Gain: {(100 * (gridstrategy[gridstrategy.length - 1].value - gridstrategy[0].value) / gridstrategy[0].value).toFixed(2)}%  </p>
+                  <p>Profitable Trades: {summary?.profitableTrades} </p>
+                  <p>Grid Profit: {summary?.gridProfit.toFixed(2)}$ </p>
+                </>
+                )}
               <br></br>
 
               <div>

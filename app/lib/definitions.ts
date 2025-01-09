@@ -41,6 +41,11 @@ export type StockData = {
   value: number
 }
 
+export type StrategyResult = {
+  stockdata: StockData[],
+  summary: any
+}
+
 export interface FlagSectionData {
   buyOnGrid: boolean;
   sellOnGrid: boolean;

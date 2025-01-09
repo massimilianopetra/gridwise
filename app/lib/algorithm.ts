@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { GridType, StockData, FlagSectionData } from '@/app/lib/definitions';
+import { GridType, StockData, FlagSectionData, StrategyResult } from '@/app/lib/definitions';
 
 export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number): GridType[] {
 
@@ -64,7 +64,7 @@ export function GometricGrid(investment: number, Pa: number, Pb: number, P: numb
     }
 };
 
-export function HoldStrategy(grid: GridType[], csv: StockData[]): StockData[] {
+export function HoldStrategy(grid: GridType[], csv: StockData[]): StrategyResult {
 
     let qty = 0;
     let initInvestent = 0;
@@ -88,7 +88,7 @@ export function HoldStrategy(grid: GridType[], csv: StockData[]): StockData[] {
         return ({ ...item, value: item.value * quota });
     });
 
-    return h;
+    return {stockdata: h, summary: null};
 }
 
 export function GridStrategy(
@@ -99,12 +99,13 @@ export function GridStrategy(
         sellOnGrid: false,
         commissionPercentage: "0",
         fixedCommission: "0",
-    }): StockData[] {
+    }): StrategyResult {
     let gridprofit = 0;
     let saved = 0;
     let _grid = grid;
     let totInvest = 0;
     let liquidity = 0;
+    let profitableTrades = 0;
 
     const result = csv.map((e) => {
         _grid = _grid.map((g) => {
@@ -116,6 +117,7 @@ export function GridStrategy(
                 if (e.value > g.sellPrice && g.status == true) {
                     const price = flags.sellOnGrid ? g.sellPrice : e.value;
                     gridprofit += (price - g.buyPrice) * g.Quantity;
+                    profitableTrades += 1;
                     return ({ ...g, status: false });
                 } else {
                     return ({ ...g });
@@ -138,7 +140,7 @@ export function GridStrategy(
         return ({ time: e.time, value: totInvest + liquidity + gridprofit + saved });
     });
 
-    return (result);
+    return ({stockdata: result, summary: {profitableTrades: profitableTrades, gridProfit: gridprofit}});
 }
 
 export function GridBackTesting(
