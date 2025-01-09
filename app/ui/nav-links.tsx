@@ -3,6 +3,7 @@
 import HomeIcon from '@mui/icons-material/Home';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
+import InsightsIcon from '@mui/icons-material/Insights';
 
 
 import Link from 'next/link';
@@ -20,7 +21,8 @@ export default function NavLinks() {
     
     links = [{ name: 'Home', href: '/home', icon: HomeIcon },
              { name: 'LiquidityPool', href: '/home/liquidity', icon: WaterDropIcon},
-             { name: 'GridTrading', href: '/home/gridtrading', icon: ViewHeadlineIcon},];
+             { name: 'GridTrading', href: '/home/gridtrading', icon: ViewHeadlineIcon},
+             { name: 'GraphTools', href: '/home/graphtools', icon: InsightsIcon},];
 
     return (
         <>
