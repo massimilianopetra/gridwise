@@ -47,7 +47,7 @@ export default function GridSummary({ rows, investment, P }: { rows: GridType[],
     { label: "Estimated max grid profit", value: (rows[0].earn * 2.5 * rows.length).toFixed(2) },
     { label: "N. Grid ", value: rows.length },
     { label: "Single Grid Profit", value: rows[0].earn.toFixed(4) },
-    { label: "Grid Step %", value: (100 * rows[0].earn / rows[0].buyPrice).toFixed(2) },
+    { label: "Grid Step %", value: (100 * rows[0].earn / (rows[0].buyPrice/rows[0].Quantity)).toFixed(2) },
 
   ];
 
