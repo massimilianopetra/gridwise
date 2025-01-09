@@ -149,7 +149,7 @@ export default function Page() {
                 </div>
                 <TradingChart
                   series={[
-                    { data: holdstrategy_graph, color: '#f44336', title: 'Stock Value' },
+                    { data: holdstrategy_graph, color: '#00aaaa', title: 'Stock Value' },
                   ]}
                   className="bg-gray-800"
                 />
