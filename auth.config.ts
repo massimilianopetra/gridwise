@@ -1,5 +1,5 @@
 import type { NextAuthConfig } from 'next-auth';
- 
+
 export const authConfig = {
   pages: {
     signIn: '/login',
@@ -11,12 +11,17 @@ export const authConfig = {
       if (isOnDashboard) {
         if (isLoggedIn) {
 
-            return true;
+          return true;
         }
         return false; // Redirect unauthenticated users to login page
       } else if (isLoggedIn) {
         //return Response.redirect(new URL('/home', nextUrl));
-        return true;
+        if (nextUrl.pathname.includes('login')) {
+          return Response.redirect(new URL('/home', nextUrl));
+        }
+        else {
+          return true;
+        }
       }
       return true;
     },
