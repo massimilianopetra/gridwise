@@ -1,15 +1,12 @@
-import Head from 'next/head';
 import Link from 'next/link';
 import Image from "next/image";
+import CookieConsent from "@/app/ui/cookieconsent";
 
 export default function HomePage() {
   return (
     <>
-      <Head>
-        <title>OpenTRadeNet - Advanced Tools for Trading</title>
-        <meta name="description" content="OpenTradeNet offers advanced utilities for trading traditional assets and cryptocurrencies. Optimize your strategies with our powerful tools." />
-      </Head>
       <main className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+        
         <section className="max-w-4xl text-center p-6">
           <Image
             src="/images/home.jpg"
@@ -23,7 +20,10 @@ export default function HomePage() {
           </h1>
 
           <p className="text-lg text-gray-600 mb-6">
-            OpenTradeNet is your go-to platform for advanced tools and utilities in the trading world. Whether you trade traditional assets or cryptocurrencies, our mission is to simplify and enhance your strategies.
+            OpenTradeNet is your go-to platform for advanced tools and utilities
+            in the trading world. Whether you trade traditional assets or cryptocurrencies,
+            our mission is to simplify and enhance your strategies. Built as an open-source platform, OpenTradeNet provides all its services free of charge,
+            fostering transparency and accessibility for everyone.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
