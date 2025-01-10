@@ -19,7 +19,7 @@
 
 import { GridType, StockData, FlagSectionData, StrategyResult } from '@/app/lib/definitions';
 
-export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number): GridType[] {
+export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number,selPercentage: boolean, selInteger: boolean): GridType[] {
 
     const grid_gain = (Pb / Pa) ** (1 / n);
     var result: GridType[] = [];
@@ -58,6 +58,16 @@ export function GometricGrid(investment: number, Pa: number, Pb: number, P: numb
                 }
             }
         }
+
+        if (selInteger) {
+            for (let i = 0; i < n; i++) {
+                result[i] = { ...result[i],
+                    Quantity: Math.trunc(result[i].Quantity), 
+                    capital: Math.trunc(result[i].Quantity)*result[i].buyPrice, 
+                    earn: Math.trunc(result[i].Quantity)*(result[i].sellPrice-result[i].buyPrice)}
+            }
+        }
+        
         return (result);
     } else {
         return ([]);

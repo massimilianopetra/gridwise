@@ -50,6 +50,7 @@ export default function Page() {
   const [open, setOpen] = useState(false);
 
   const [selPercentage, setSelPercentage] = useState(false);
+  const [selInteger, setSelInteger] = useState(false);
   const [summary, setSummary] = useState<ISummary>();
   const [viewGraph, setViewgraph] = useState(false);
   const [isGraphPercentage, setIsGraphPercentage] = useState(false);
@@ -86,7 +87,7 @@ export default function Page() {
     // Controllo congruenza parametri
     if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {
 
-      const grid = GometricGrid(investment, Pa, Pb, P, n, iteration);
+      const grid = GometricGrid(investment, Pa, Pb, P, n, iteration, selPercentage, selInteger);
       setRows(grid);
       setStatus("computed");
     } else {
@@ -121,24 +122,27 @@ export default function Page() {
     const qty = GetHoldQuantity(rows, P);
     const grid_line: StockData[][] = Array.from({ length: rows.length + 1 }, () => [...holdstrategy]);
 
-    const transformedGridLine = grid_line.map((row, index) =>
-      row.map(item => {
-        if (index < rows.length) {
-          return ({ time: item.time, value: rows[index].buyPrice * qty });
-        } else {
-          return ({ time: item.time, value: rows[index - 1].sellPrice * qty });
-        }
-      })
-    );
+
 
     if (!percentage) {
       /* absolute */
 
+      const originalArray = [
+        { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
+        { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
+      ];
+
       if (grid) {
-        const originalArray = [
-          { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
-          { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
-        ];
+
+        const transformedGridLine = grid_line.map((row, index) =>
+          row.map(item => {
+            if (index < rows.length) {
+              return ({ time: item.time, value: rows[index].buyPrice * qty });
+            } else {
+              return ({ time: item.time, value: rows[index - 1].sellPrice * qty });
+            }
+          })
+        );
 
         // Aggiungi le righe di transformedGridLine all'array originale
         const newArray = [
@@ -151,13 +155,13 @@ export default function Page() {
         ];
         setSeries(newArray);
       } else {
-        setSeries([
-          { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
-          { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
-        ]);
+        setSeries(originalArray);
       }
 
     } else {
+
+      /* percentage */
+
       const h = holdstrategy.map((item) => {
         return ({ ...item, value: 100 * (item.value - holdstrategy[0].value) / holdstrategy[0].value })
       })
@@ -165,10 +169,37 @@ export default function Page() {
         return ({ ...item, value: 100 * (item.value - gridstrategy[0].value) / gridstrategy[0].value })
       })
 
-      setSeries([
+      const originalArray = [
         { data: h, color: '#f44336', title: 'Hold Strategy' },
         { data: g, color: '#4caf50', title: 'Grid Strategy' },
-      ]);
+      ]
+
+      if (grid) {
+
+        const transformedGridLine = grid_line.map((row, index) =>
+          row.map(item => {
+            if (index < rows.length) {
+              return ({ time: item.time, value: 100 * (rows[index].buyPrice - P) / P });
+            } else {
+              return ({ time: item.time, value: 100 * (rows[index - 1].sellPrice - P) / P });
+            }
+          })
+        );
+
+        // Aggiungi le righe di transformedGridLine all'array originale
+        const newArray = [
+          ...originalArray,
+          ...transformedGridLine.map((data, index) => ({
+            data: data,
+            color: '#00aaaa', // Colore personalizzato per ogni nuovo elemento
+            //title: `G${index + 1}`, // Titolo con numerazione (G1, G2, ...)
+          }))
+        ];
+        setSeries(newArray);
+
+      } else {
+        setSeries(originalArray);
+      }
 
     }
   }
@@ -362,6 +393,10 @@ export default function Page() {
               <FormControlLabel
                 control={<Switch checked={selPercentage} onChange={() => setSelPercentage((prevSelected) => !prevSelected)} />}
                 label={selPercentage ? 'Percentage' : 'N.Grid'}
+              />
+              <FormControlLabel
+                control={<Switch checked={selInteger} onChange={() => setSelInteger((prevSelected) => !prevSelected)} />}
+                label={selInteger ? 'Integer Qty' : 'Float Qty.'}
               />
             </div>
             <div className='flex flex-row space-x-4'>
