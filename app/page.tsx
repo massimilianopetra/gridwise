@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import Image from "next/image";
-import CookieConsent from "@/app/ui/cookieconsent";
 
 export default function HomePage() {
   return (

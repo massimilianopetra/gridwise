@@ -154,10 +154,23 @@ export default function HomePage() {
                   <ListItemText primary="Detailed performance metrics." />
                 </ListItem>
               </List>
-              <Box textAlign="center" sx={{ mt: 2 }}>
+              <Box
+                textAlign="center"
+                sx={{
+                  mt: 2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: 2 // Spazio tra i bottoni
+                }}
+              >
                 <Link href="/home/gridtrading" passHref>
                   <Button variant="contained" color="primary">
                     Go To Service
+                  </Button>
+                </Link>
+                <Link href="/home/gridtrading_doc" passHref>
+                  <Button variant="contained" color="primary">
+                    Documentation
                   </Button>
                 </Link>
               </Box>
