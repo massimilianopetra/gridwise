@@ -44,7 +44,7 @@ const TradingChart: React.FC<TradingChartProps> = ({ series, className }) => {
     });
 
     // Aggiungi serie con opzioni personalizzate
-    series.forEach(({ data, color, title }, index) => {
+    series.forEach(({ data, color, title, }, index) => {
       const lineSeries = chart.addLineSeries({
         color,
         lineWidth: 2,
@@ -55,6 +55,11 @@ const TradingChart: React.FC<TradingChartProps> = ({ series, className }) => {
       // Aggiungi titolo opzionale
       if (title) {
         lineSeries.applyOptions({ title });
+      } else {
+        lineSeries.applyOptions({
+          lastValueVisible: false,
+          priceLineVisible: false,
+        });
       }
     });
 

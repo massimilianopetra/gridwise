@@ -31,7 +31,7 @@ import GridTable from '@/app/ui/grid-table';
 import GridSummary from '@/app/ui/grid-summary';
 import { GometricGrid } from '@/app/lib/algorithm';
 import CsvFileReader from '@/app/ui/CsvFileReader';
-import { GridBackTesting, HoldStrategy, GridStrategy } from '@/app/lib/algorithm';
+import { GridBackTesting, HoldStrategy, GridStrategy, GetHoldQuantity } from '@/app/lib/algorithm';
 import { StockData } from '@/app/lib/definitions'
 import TradingChart from '@/app/ui/TradingChart';
 import FlagSection from '@/app/ui/FlagSection';
@@ -40,6 +40,12 @@ interface ISummary {
   profitableTrades: number,
   gridProfit: number
 }
+interface GraphSeries {
+  data: StockData[],
+  color: string,
+  title?: string
+}
+
 export default function Page() {
   const [open, setOpen] = useState(false);
 
@@ -47,11 +53,11 @@ export default function Page() {
   const [summary, setSummary] = useState<ISummary>();
   const [viewGraph, setViewgraph] = useState(false);
   const [isGraphPercentage, setIsGraphPercentage] = useState(false);
+  const [isViewGrid, setIsViewGrid] = useState(false);
   const [rows, setRows] = useState<GridType[]>([]);
   const [holdstrategy, setSetHoldstrategy] = useState<StockData[]>([]);
   const [gridstrategy, setSetGridstrategy] = useState<StockData[]>([]);
-  const [holdstrategy_graph, setSetHoldstrategy_graph] = useState<StockData[]>([]);
-  const [gridstrategy_graph, setSetGridstrategy_graph] = useState<StockData[]>([]);
+  const [series, setSeries] = useState<GraphSeries[]>([]);
   const [status, setStatus] = useState("initial");
   const inputInvestmentRef = useRef<HTMLInputElement>(null);
   const inputPaRef = useRef<HTMLInputElement>(null);
@@ -98,30 +104,95 @@ export default function Page() {
     setSetHoldstrategy(h.stockdata);
     setSetGridstrategy(g.stockdata);
     setSummary(g.summary)
-    setSetHoldstrategy_graph(h.stockdata);
-    setSetGridstrategy_graph(g.stockdata);
+
+    setSeries([
+      { data: h.stockdata, color: '#f44336', title: 'Hold Strategy' },
+      { data: g.stockdata, color: '#4caf50', title: 'Grid Strategy' },
+    ]);
     setViewgraph(true);
 
     //setRawData(result.join("\n"));
     console.log(result.join("\n"));
   };
 
+  function buildSeries(percentage: boolean, grid: boolean) {
+
+    const P = parseFloat(inputPRef.current?.value || '0');
+    const qty = GetHoldQuantity(rows, P);
+    const grid_line: StockData[][] = Array.from({ length: rows.length + 1 }, () => [...holdstrategy]);
+
+    const transformedGridLine = grid_line.map((row, index) =>
+      row.map(item => {
+        if (index < rows.length) {
+          return ({ time: item.time, value: rows[index].buyPrice * qty });
+        } else {
+          return ({ time: item.time, value: rows[index - 1].sellPrice * qty });
+        }
+      })
+    );
+
+    if (!percentage) {
+      /* absolute */
+
+      if (grid) {
+        const originalArray = [
+          { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
+          { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
+        ];
+
+        // Aggiungi le righe di transformedGridLine all'array originale
+        const newArray = [
+          ...originalArray,
+          ...transformedGridLine.map((data, index) => ({
+            data: data,
+            color: '#00aaaa', // Colore personalizzato per ogni nuovo elemento
+            //title: `G${index + 1}`, // Titolo con numerazione (G1, G2, ...)
+          }))
+        ];
+        setSeries(newArray);
+      } else {
+        setSeries([
+          { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
+          { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
+        ]);
+      }
+
+    } else {
+      const h = holdstrategy.map((item) => {
+        return ({ ...item, value: 100 * (item.value - holdstrategy[0].value) / holdstrategy[0].value })
+      })
+      const g = gridstrategy.map((item) => {
+        return ({ ...item, value: 100 * (item.value - gridstrategy[0].value) / gridstrategy[0].value })
+      })
+
+      setSeries([
+        { data: h, color: '#f44336', title: 'Hold Strategy' },
+        { data: g, color: '#4caf50', title: 'Grid Strategy' },
+      ]);
+
+    }
+  }
+
+  const handleToggleShowGrid = () => {
+    setIsViewGrid((prev) => {
+      if (prev) {
+        buildSeries(isGraphPercentage, false);
+        return false;
+      } else {
+        buildSeries(isGraphPercentage, true);
+        return true;
+      }
+    });
+
+  };
+
   const handleToggleIsGraphPercentage = () => {
     setIsGraphPercentage((prev) => {
       if (prev) {
-        /* absolute */
-        setSetHoldstrategy_graph(holdstrategy);
-        setSetGridstrategy_graph(gridstrategy);
+        buildSeries(false, isViewGrid);
         return false;
       } else {
-        const h = holdstrategy.map((item) => {
-          return ({ ...item, value: 100 * (item.value - holdstrategy[0].value) / holdstrategy[0].value })
-        })
-        const g = gridstrategy.map((item) => {
-          return ({ ...item, value: 100 * (item.value - gridstrategy[0].value) / gridstrategy[0].value })
-        })
-        setSetHoldstrategy_graph(h);
-        setSetGridstrategy_graph(g);
+        buildSeries(true, isViewGrid);
         return true;
       }
     });
@@ -166,7 +237,7 @@ export default function Page() {
               {viewGraph &&
                 (<>
                   <p>Initial Capital: {gridstrategy[0].value.toFixed(2)} </p>
-                  <p>Final Capital: {gridstrategy[gridstrategy.length - 1].value .toFixed(2)} </p>
+                  <p>Final Capital: {gridstrategy[gridstrategy.length - 1].value.toFixed(2)} </p>
                   <p>Strategy Gain: {(100 * (gridstrategy[gridstrategy.length - 1].value - gridstrategy[0].value) / gridstrategy[0].value).toFixed(2)}%  </p>
                   <p>Profitable Trades: {summary?.profitableTrades} </p>
                   <p>Grid Profit: {summary?.gridProfit.toFixed(2)}$ </p>
@@ -182,12 +253,13 @@ export default function Page() {
                         control={<Switch checked={isGraphPercentage} onChange={handleToggleIsGraphPercentage} />}
                         label={isGraphPercentage ? 'Percentage Value' : 'Absolute Value'}
                       />
+                      <FormControlLabel
+                        control={<Switch checked={isViewGrid} onChange={handleToggleShowGrid} />}
+                        label={isViewGrid ? 'Hide Grid' : 'Show Grid'}
+                      />
                     </div>
                     <TradingChart
-                      series={[
-                        { data: holdstrategy_graph, color: '#f44336', title: 'Hold Strategy' },
-                        { data: gridstrategy_graph, color: '#4caf50', title: 'Grid Strategy' },
-                      ]}
+                      series={series}
                       className="bg-gray-800"
                     />
                   </>

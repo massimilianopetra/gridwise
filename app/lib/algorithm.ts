@@ -64,6 +64,28 @@ export function GometricGrid(investment: number, Pa: number, Pb: number, P: numb
     }
 };
 
+export function GetHoldQuantity(grid: GridType[], currentprice: number): number {
+    let qty = 0;
+    let initInvestent = 0;
+    let saved = 0;
+    let future = 0;
+
+    grid.forEach((item) => {
+        if (currentprice < item.buyPrice) {
+            qty += item.Quantity
+            initInvestent += item.Quantity * currentprice;
+            saved += item.Quantity * (item.buyPrice - currentprice)
+
+        } else {
+            future += item.Quantity * item.buyPrice;
+        }
+    });
+
+    const quota = (initInvestent + future) / currentprice
+
+    return quota;
+}
+
 export function HoldStrategy(grid: GridType[], csv: StockData[]): StrategyResult {
 
     let qty = 0;
