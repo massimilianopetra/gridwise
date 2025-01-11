@@ -1,10 +1,30 @@
+'use client'
+
 import React from 'react';
 import { Box, Typography, Card, CardContent, List, ListItem, ListItemText, Button, Divider } from '@mui/material';
 import Link from 'next/link';
+import Marquee from "@/app/ui/Marquee";
 
 export default function HomePage() {
+
+  const stock = [
+    { symbol: "AAPL", change: +2.5 },
+    { symbol: "TSLA", change: -3.7 },
+    { symbol: "AMZN", change: +1.2 },
+    { symbol: "GOOGL", change: -0.8 },
+    { symbol: "META", change: -2.3 },
+    { symbol: "NFLX", change: +0.5 },
+  ];
+
   return (
     <main>
+      <div style={{ padding: "20px" }}>
+        <Marquee
+          stocks={stock}
+          description="Market Update:"
+          descriptionPadding={20}
+        />
+      </div>
       <Box
         sx={{
           minHeight: '100vh',
@@ -16,6 +36,7 @@ export default function HomePage() {
           p: 3,
         }}
       >
+
         {/* Titolo principale */}
         <Typography
           variant="h2"

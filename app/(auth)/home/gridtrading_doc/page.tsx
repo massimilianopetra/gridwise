@@ -26,7 +26,7 @@ export default function HomePage() {
                     textAlign="center"
                     sx={{ mb: 6 }}
                 >
-                    OpenTradeNet Accademy
+                    OpenTradeNet Academy
                 </Typography>
 
                 <Box maxWidth="lg" sx={{ width: '100%' }}>

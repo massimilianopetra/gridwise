@@ -35,6 +35,7 @@ import { GridBackTesting, HoldStrategy, GridStrategy, GetHoldQuantity } from '@/
 import { StockData } from '@/app/lib/definitions'
 import TradingChart from '@/app/ui/TradingChart';
 import FlagSection from '@/app/ui/FlagSection';
+import Marquee from "@/app/ui/Marquee";
 
 interface ISummary {
   profitableTrades: number,
@@ -73,6 +74,15 @@ export default function Page() {
     fixedCommission: "0",
   });
 
+
+  const stock = [
+    { symbol: "AAPL", change: +2.5 },
+    { symbol: "TSLA", change: -3.7 },
+    { symbol: "AMZN", change: +1.2 },
+    { symbol: "GOOGL", change: -0.8 },
+    { symbol: "META", change: -2.3 },
+    { symbol: "NFLX", change: +0.5 },
+  ];
 
   const handleCalculation = () => {
     setStatus("computing");
@@ -321,7 +331,13 @@ export default function Page() {
 
   return (
     <div style={{ height: 250, width: '100%' }}>
-
+    <div style={{ padding: "20px" }}>
+      <Marquee 
+        stocks={stock} 
+        description="Market Update:" 
+        descriptionPadding={20} 
+      />
+    </div>
       <br></br>
       <div className='space-y-6'>
         <Card sx={{ maxWidth: 600, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
