@@ -248,96 +248,16 @@ export default function Page() {
     setFlags((prev) => ({ ...prev, ...data }));
   };
 
-  const render = function () {
-
-    switch (status) {
-      case "computing":
-        return (<CircularProgress size="9rem" />);
-      case "computed":
-        const investment = parseFloat(inputInvestmentRef.current?.value || '0');
-        const P = parseFloat(inputPRef.current?.value || '0');
-        return (
-          <div>
-            <GridTable rows={rows} />
-            <br></br>
-            <GridSummary rows={rows} investment={investment} P={P} />
-            <br></br>
-            <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
-              <Typography className="text-blue-900 text-center" variant="h5" gutterBottom>
-                Investment Backtesting
-              </Typography>
-
-
-              <CsvFileReader onFileLoad={handleFileLoad} />
-              <br></br>
-              <FlagSection onFlagsChange={handleFlagsChange} onCommissionChange={handleCommissionChange} />
-
-
-
-              <br></br>
-              {viewGraph &&
-                (<>
-                  <p>Initial Capital: {gridstrategy[0].value.toFixed(2)} </p>
-                  <p>Final Capital: {gridstrategy[gridstrategy.length - 1].value.toFixed(2)} </p>
-                  <p>Strategy Gain: {(100 * (gridstrategy[gridstrategy.length - 1].value - gridstrategy[0].value) / gridstrategy[0].value).toFixed(2)}%  </p>
-                  <p>Profitable Trades: {summary?.profitableTrades} </p>
-                  <p>Grid Profit: {summary?.gridProfit.toFixed(2)}$ </p>
-                </>
-                )}
-              <br></br>
-
-              <div>
-                {viewGraph && (
-                  <>
-                    <div className="flex justify-between items-center mb-2">
-                      <FormControlLabel
-                        control={<Switch checked={isGraphPercentage} onChange={handleToggleIsGraphPercentage} />}
-                        label={isGraphPercentage ? 'Percentage Value' : 'Absolute Value'}
-                      />
-                      <FormControlLabel
-                        control={<Switch checked={isViewGrid} onChange={handleToggleShowGrid} />}
-                        label={isViewGrid ? 'Hide Grid' : 'Show Grid'}
-                      />
-                    </div>
-                    <TradingChart
-                      series={series}
-                      className="bg-gray-800"
-                    />
-                  </>
-                )}
-              </div>
-            </Card>
-            <br></br>
-            <Card>
-              {/*<TextField
-                label="Test Result"
-                multiline
-                rows={10}
-                value={rawData}
-                variant="outlined"
-                fullWidth
-                className="mt-4"
-              />*/}
-            </Card>
-
-          </div >
-        );
-
-      default:
-        return (<Box></Box>);
-
-    }
-  }
 
   return (
     <div style={{ height: 250, width: '100%' }}>
-    <div style={{ padding: "20px" }}>
-      <Marquee 
-        stocks={stock} 
-        description="Market Update:" 
-        descriptionPadding={20} 
-      />
-    </div>
+      <div style={{ padding: "20px" }}>
+        <Marquee
+          stocks={stock}
+          description="Market Update:"
+          descriptionPadding={20}
+        />
+      </div>
       <br></br>
       <div className='space-y-6'>
         <Card sx={{ maxWidth: 600, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
@@ -435,9 +355,59 @@ export default function Page() {
             </Button>
           </CardActions>
         </Card>
-        <div>
-          {render()}
-        </div>
+        {(status == "computed") &&
+          <>
+            <GridTable rows={rows} />
+            <br></br>
+            <GridSummary rows={rows} investment={parseFloat(inputInvestmentRef.current?.value || '0')} P={parseFloat(inputPRef.current?.value || '0')} />
+            <br></br>
+            <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
+              <Typography className="text-blue-900 text-center" variant="h5" gutterBottom>
+                Investment Backtesting
+              </Typography>
+
+
+              <CsvFileReader onFileLoad={handleFileLoad} />
+              <br></br>
+              <FlagSection onFlagsChange={handleFlagsChange} onCommissionChange={handleCommissionChange} />
+
+
+
+              <br></br>
+              {viewGraph &&
+                (<>
+                  <p>Initial Capital: {gridstrategy[0].value.toFixed(2)} </p>
+                  <p>Final Capital: {gridstrategy[gridstrategy.length - 1].value.toFixed(2)} </p>
+                  <p>Strategy Gain: {(100 * (gridstrategy[gridstrategy.length - 1].value - gridstrategy[0].value) / gridstrategy[0].value).toFixed(2)}%  </p>
+                  <p>Profitable Trades: {summary?.profitableTrades} </p>
+                  <p>Grid Profit: {summary?.gridProfit.toFixed(2)}$ </p>
+                </>
+                )}
+              <br></br>
+
+              <div>
+                {viewGraph && (
+                  <>
+                    <div className="flex justify-between items-center mb-2">
+                      <FormControlLabel
+                        control={<Switch checked={isGraphPercentage} onChange={handleToggleIsGraphPercentage} />}
+                        label={isGraphPercentage ? 'Percentage Value' : 'Absolute Value'}
+                      />
+                      <FormControlLabel
+                        control={<Switch checked={isViewGrid} onChange={handleToggleShowGrid} />}
+                        label={isViewGrid ? 'Hide Grid' : 'Show Grid'}
+                      />
+                    </div>
+                    <TradingChart
+                      series={series}
+                      className="bg-gray-800"
+                    />
+                  </>
+                )}
+              </div>
+            </Card>
+          </>
+        }
 
         <Snackbar open={open} autoHideDuration={6000} onClose={() => { setOpen(false) }} anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}>
           <Alert

@@ -1,12 +1,60 @@
 'use client'
 
-import { Card, Typography, Box } from '@mui/material';
+/*
+ * This file is part of the project by Massimiliano Petra.
+ *
+ * Copyright (C) 2025 Massimiliano Petra
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+import React, { useState } from 'react';
+import { Card, Typography, Box, Button, TextField } from '@mui/material';
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { GridType } from '@/app/lib/definitions';
 
 
 
 export default function GridTable({ rows }: { rows: GridType[] }) {
+
+  const [fileName, setFileName] = useState('exported_data.csv'); // Nome del file predefinito
+
+  // Funzione per convertire i dati in CSV senza virgolette
+  const convertToCSV = (data: typeof rows) => {
+    const headers = Object.keys(data[0]); // Intestazioni
+    const csvRows = data.map((row) =>
+      headers.map((header) => row[header as keyof typeof row]).join(';')
+    );
+    return [headers.join(';'), ...csvRows].join('\n');
+  };
+
+  // Funzione per esportare i dati
+  const handleExportCSV = () => {
+    const csvData = convertToCSV(rows);
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+
+    // Usa il nome del file scelto dall'utente
+    link.setAttribute('download', fileName);
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const columns: GridColDef[] = [
     {
@@ -165,6 +213,23 @@ export default function GridTable({ rows }: { rows: GridType[] }) {
               }}
             />
           </Box>
+        </div>
+        <div className="flex items-center justify-between mt-4">
+          <TextField
+            label="File Name"
+            variant="outlined"
+            size="small"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            sx={{ marginRight: 2 }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleExportCSV}
+          >
+            Export to CSV
+          </Button>
         </div>
       </div>
     </Card>
