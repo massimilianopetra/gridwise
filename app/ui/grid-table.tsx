@@ -19,42 +19,46 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Typography, Box, Button, TextField } from '@mui/material';
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { GridType } from '@/app/lib/definitions';
+import { convertToCSV } from '../lib/utility';
 
 
 
 export default function GridTable({ rows }: { rows: GridType[] }) {
 
-  const [fileName, setFileName] = useState('exported_data.csv'); // Nome del file predefinito
+  const [decimalSeparator, setDecimalSeparator] = useState<string>(',');
+  const [currency, setCurrency] = useState<string>('EUR');
 
-  // Funzione per convertire i dati in CSV senza virgolette
-  const convertToCSV = (data: typeof rows) => {
-    const headers = Object.keys(data[0]); // Intestazioni
-    const csvRows = data.map((row) =>
-      headers.map((header) => row[header as keyof typeof row]).join(';')
-    );
-    return [headers.join(';'), ...csvRows].join('\n');
-  };
+  // Load preferences from localStorage or set defaults
+  useEffect(() => {
+    const savedDecimalSeparator = localStorage.getItem('decimalSeparator') || '.';
+    const savedCurrency = localStorage.getItem('currency') || 'USD';
 
-  // Funzione per esportare i dati
+    setDecimalSeparator(savedDecimalSeparator);
+    setCurrency(savedCurrency);
+  }, []);
+
   const handleExportCSV = () => {
-    const csvData = convertToCSV(rows);
+    const csvData = convertToCSV(rows, decimalSeparator);
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-
+  
     const link = document.createElement('a');
     link.href = url;
-
+  
     // Usa il nome del file scelto dall'utente
-    link.setAttribute('download', fileName);
+    link.setAttribute('download', 'exported_grid.csv');
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+  
+ 
+  
 
   const columns: GridColDef[] = [
     {
@@ -215,14 +219,6 @@ export default function GridTable({ rows }: { rows: GridType[] }) {
           </Box>
         </div>
         <div className="flex items-center justify-between mt-4">
-          <TextField
-            label="File Name"
-            variant="outlined"
-            size="small"
-            value={fileName}
-            onChange={(e) => setFileName(e.target.value)}
-            sx={{ marginRight: 2 }}
-          />
           <Button
             variant="contained"
             color="primary"
