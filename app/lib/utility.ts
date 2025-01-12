@@ -3,7 +3,7 @@
     if (!data || data.length === 0) return '';
   
     // Ottieni le intestazioni
-    const headers = Object.keys(data[0]).join(',');
+    const headers = Object.keys(data[0]).join(';');
   
     // Genera righe dei dati
     const rows = data.map(row => {
