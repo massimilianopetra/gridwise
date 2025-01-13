@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
-import { parseCsv } from "../utils/parseCsv";
+import { parseCsv } from "@/app/lib/utility"
 
 type GridType = {
   id: number;
