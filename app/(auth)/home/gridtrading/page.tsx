@@ -19,7 +19,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Card, CardContent, CardActions, TextField, Typography, Button, FormControlLabel } from '@mui/material';
 import Switch from '@mui/material/Switch';
 import { Box } from "@mui/material";
@@ -32,6 +32,7 @@ import GridSummary from '@/app/ui/grid-summary';
 import { GometricGrid } from '@/app/lib/algorithm';
 import CsvFileReader from '@/app/ui/CsvFileReader';
 import { GridBackTesting, HoldStrategy, GridStrategy, GetHoldQuantity } from '@/app/lib/algorithm';
+import { parseCsv } from '@/app/lib/utility';
 import { StockData } from '@/app/lib/definitions'
 import TradingChart from '@/app/ui/TradingChart';
 import FlagSection from '@/app/ui/FlagSection';
@@ -67,12 +68,24 @@ export default function Page() {
   const inputPRef = useRef<HTMLInputElement>(null);
   const inputNGridRef = useRef<HTMLInputElement>(null);
   const inputNIterationRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [flags, setFlags] = useState({
     buyOnGrid: false,
     sellOnGrid: false,
     commissionPercentage: "0",
     fixedCommission: "0",
   });
+  const [decimalSeparator, setDecimalSeparator] = useState<string>(',');
+  const [currency, setCurrency] = useState<string>('EUR');
+
+  // Load preferences from localStorage or set defaults
+  useEffect(() => {
+    const savedDecimalSeparator = localStorage.getItem('decimalSeparator') || '.';
+    const savedCurrency = localStorage.getItem('currency') || 'USD';
+
+    setDecimalSeparator(savedDecimalSeparator);
+    setCurrency(savedCurrency);
+  }, []);
 
 
   const stock = [
@@ -84,7 +97,69 @@ export default function Page() {
     { symbol: "NFLX", change: +0.5 },
   ];
 
-  const handleCalculation = () => {
+  const handleButtonImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportGrid = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        try {
+          const fileContent = e.target.result as string;
+
+          const typeDef: GridType = {
+            id: 0,
+            Quantity: 0,
+            buyPrice: 0,
+            capital: 0,
+            sellPrice: 0,
+            earn: 0,
+            status: false,
+          };
+          console.log(fileContent);
+          const data = parseCsv<GridType>(fileContent, decimalSeparator, typeDef);
+          setRows(data);
+
+          if (inputPaRef.current) {
+            inputPaRef.current.value = data[0].buyPrice.toFixed(3);
+          }
+          if (inputPbRef.current) {
+            inputPbRef.current.value = data[data.length-1].sellPrice.toFixed(3);
+          }
+          if (inputNGridRef.current) {
+            inputNGridRef.current.value = (data.length).toFixed(0);
+          }
+          if (inputInvestmentRef.current && inputPRef.current) {
+            let value = 0;
+            let P=-1;
+            data.forEach((item) => {
+              value += item.capital;
+              if (item.status && P <0) {
+                P=item.buyPrice;
+              }
+            });
+            inputInvestmentRef.current.value = (value).toFixed(0);
+            inputPRef.current.value = (P).toFixed(3);
+          }
+
+          
+
+
+          setStatus("computed");
+        } catch (error) {
+          console.error("Error parsing CSV:", error);
+          alert("Invalid CSV format. Please check your file.");
+        }
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleButtonCompute = () => {
     setStatus("computing");
     setViewgraph(false);
     const investment = parseFloat(inputInvestmentRef.current?.value || '0');
@@ -350,9 +425,23 @@ export default function Page() {
             </div>
           </CardContent>
           <CardActions>
-            <Button variant="contained" color="primary" onClick={handleCalculation}>
+            <Button variant="contained" color="primary" onClick={handleButtonCompute}>
               Compute Grid
             </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleButtonImport}
+            >
+              Import Grid
+            </Button>
+            <input
+              type="file"
+              accept=".csv"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleImportGrid}
+            />
           </CardActions>
         </Card>
         {(status == "computed") &&
