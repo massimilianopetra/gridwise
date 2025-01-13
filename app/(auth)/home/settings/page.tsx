@@ -67,7 +67,7 @@ export default function Page() {
         <Box component="form" noValidate autoComplete="off" sx={{ mt: 3 }}>
           {/* Decimal Separator Field */}
           <Typography className="text-blue-900" variant="body1" sx={{ mb: 1 }}>
-            Decimal Separator
+            Decimal Separator Import/Export CSV
           </Typography>
           <TextField
             select

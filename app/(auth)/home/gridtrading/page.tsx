@@ -128,28 +128,28 @@ export default function Page() {
             inputPaRef.current.value = data[0].buyPrice.toFixed(3);
           }
           if (inputPbRef.current) {
-            inputPbRef.current.value = data[data.length-1].sellPrice.toFixed(3);
+            inputPbRef.current.value = data[data.length - 1].sellPrice.toFixed(3);
           }
           if (inputNGridRef.current) {
             inputNGridRef.current.value = (data.length).toFixed(0);
           }
           if (inputInvestmentRef.current && inputPRef.current) {
             let value = 0;
-            let P=-1;
+            let P = -1;
             data.forEach((item) => {
               value += item.capital;
-              if (item.status && P <0) {
-                P=item.buyPrice;
+              if (item.status && P < 0) {
+                P = item.buyPrice;
               }
             });
             inputInvestmentRef.current.value = (value).toFixed(0);
             inputPRef.current.value = (P).toFixed(3);
           }
 
-          
-
-
+          // Resetta il valore per consentire la selezione dello stesso file
+          event.target.value = "";
           setStatus("computed");
+
         } catch (error) {
           console.error("Error parsing CSV:", error);
           alert("Invalid CSV format. Please check your file.");
@@ -199,6 +199,7 @@ export default function Page() {
 
     //setRawData(result.join("\n"));
     console.log(result.join("\n"));
+
   };
 
   function buildSeries(percentage: boolean, grid: boolean) {
