@@ -108,7 +108,7 @@ export default function RegisterForm() {
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       return;
-    }
+    }s
 
     // Handle registration logic here
     setShowForm(false);
@@ -116,7 +116,7 @@ export default function RegisterForm() {
     setActivationCode(newCode);
 
     const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
-    const subject = "Activation Code";
+    const subject = `Activation Code ${activationCode}`;;
 
     await fetch('/api/send-email', {
       method: 'POST',
