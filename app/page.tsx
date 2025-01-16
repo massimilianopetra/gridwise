@@ -5,7 +5,7 @@ export default function HomePage() {
   return (
     <>
       <main className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
-        
+
         <section className="max-w-4xl text-center p-6">
           <Image
             src="/images/home.jpg"
@@ -42,11 +42,18 @@ export default function HomePage() {
             </div>
           </div>
 
-          <Link href="/home">
-            <p className="mt-6 inline-block bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition">
-              Explore Our Tools
-            </p>
-          </Link>
+          <div className="flex justify-center space-x-4 mt-6">
+            <Link href="/home">
+              <p className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition">
+                Explore Our Tools
+              </p>
+            </Link>
+            <Link href="/register">
+              <p className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition">
+                Register Account
+              </p>
+            </Link>
+          </div>
         </section>
       </main>
 

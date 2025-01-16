@@ -7,9 +7,11 @@ import {
   InputAdornment,
   Typography,
   Snackbar,
+  Box,
   Alert,
 } from '@mui/material';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -124,14 +126,26 @@ export default function RegisterForm() {
           }
           label="I have read and agree to the terms and conditions"
         />
-        <Button
-          fullWidth
-          type="submit"
-          variant="contained"
-          color="primary"
-        >
-          Register
-        </Button>
+        <Box sx={{ mt: 4, textAlign: 'center' }}>
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ mb: 2 }}
+          >
+            Register
+          </Button>
+
+          <Link href="/terms-of-use" passHref>
+            <Typography
+              color="primary"
+              sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+            >
+              Terms of Use
+            </Typography>
+          </Link>
+        </Box>
       </form>
       <Snackbar
         open={snackbarOpen}
