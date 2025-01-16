@@ -35,7 +35,7 @@ import { cookies } from 'next/headers';
 export async function seedUsers(users: DbUser[]) {
   await executeQuery(`
     CREATE TABLE IF NOT EXISTS gw_users (
-       id INTEGER PRIMARY KEY,
+       id SERIAL PRIMARY KEY,
        name VARCHAR(255) NOT NULL,
        email TEXT NOT NULL UNIQUE,
        password TEXT NOT NULL
@@ -50,8 +50,8 @@ export async function seedUsers(users: DbUser[]) {
 
       try {
         executeQuery(`
-           INSERT INTO gw_users (id, name, email, password)
-           VALUES (${user.id}, '${user.name}', '${user.email}', '${hashedPassword}')
+           INSERT INTO gw_users (name, email, password)
+           VALUES ('${user.name}', '${user.email}', '${hashedPassword}')
            ON CONFLICT (id) DO NOTHING;
         `);
         return "";
@@ -126,24 +126,45 @@ export async function getUser(email: string): Promise<DbUser | undefined> {
   }
 }
 
+export async function addUsers(email: string, name: string, password: string) {
+  await executeQuery(`
+    CREATE TABLE IF NOT EXISTS gw_users (
+       id SERIAL PRIMARY KEY,
+       name VARCHAR(255) NOT NULL,
+       email TEXT NOT NULL UNIQUE,
+       password TEXT NOT NULL
+     );
+   `);
+
+  console.log(`CREATED TABLE gw_users`);
+
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await executeQuery(`
+           INSERT INTO gw_users (name, email, password)
+           VALUES ('${name}', '${email}', '${hashedPassword}');
+  `);
+
+}
 
 /* ******************** DB TOOLS    ********************* */
 
 export async function listTables(): Promise<any[] | undefined> {
-  const result = await executeQuery(`SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'`);
+  const result = await executeQuery(`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'`);
   return result;
 }
 
 export async function doSelect(tableName: string): Promise<any[] | undefined> {
   try {
 
-    const query = `SELECT * FROM ${tableName}`;
+    const query = `SELECT * FROM ${ tableName } `;
     console.log(query)
     const result = await executeQuery(query);
     console.log(result);
     return result;
   } catch (error) {
-    console.log(`ERROR: doSelect(SELECT * FROM ${tableName})`);
+    console.log(`ERROR: doSelect(SELECT * FROM ${ tableName })`);
     console.log(error);
     return [];
   }
@@ -152,7 +173,7 @@ export async function doSelect(tableName: string): Promise<any[] | undefined> {
 export async function doTruncate(tableName: string): Promise<any[] | undefined> {
   try {
 
-    const query = `TRUNCATE TABLE ${tableName}`;
+    const query = `TRUNCATE TABLE ${ tableName } `;
     console.log(query)
     const result = await executeQuery(query);
     return result;
@@ -164,7 +185,7 @@ export async function doTruncate(tableName: string): Promise<any[] | undefined> 
 export async function doDrop(tableName: string): Promise<any[] | undefined> {
   try {
 
-    const query = `DROP TABLE ${tableName}`;
+    const query = `DROP TABLE ${ tableName } `;
     console.log(query)
     const result = await executeQuery(query);
     return result;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TextField,
   Button,
@@ -11,6 +11,7 @@ import {
   Alert,
 } from '@mui/material';
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/24/outline';
+import { addUsers } from '../lib/actions';
 import Link from 'next/link';
 
 export default function RegisterForm() {
@@ -21,8 +22,60 @@ export default function RegisterForm() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error');
+  const [showForm, setShowForm] = useState(true);
+  const [activationCode, setActivationCode] = useState('');
+  const [enteredCode, setEnteredCode] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0); // tempo rimanente in secondi
 
-  const handleSubmit = (event: React.FormEvent) => {
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      timer = setInterval(() => {
+        setResendCooldown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  const handleSubmitVerify = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Logica di verifica del codice
+    console.log(`EnteredcCode ${enteredCode} - ${activationCode}`)
+    if (enteredCode.toString() == activationCode) {
+      setIsVerified(true);
+
+      addUsers(email, "USER", password);
+
+    } else {
+      alert('Invalid code, please try again.');
+      setSnackbarMessage('Invalid code, please try again.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleResendCode = async () => {
+    // Logica per inviare di nuovo il codice (ad esempio, se l'utente ha perso la mail)
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    setActivationCode(newCode);
+
+    const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
+    const subject = "Activation Code";
+
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: email, subject: subject, text: message }),
+    });
+
+    // Imposta il cooldown a 3 minuti (180 secondi)
+    setResendCooldown(180);
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -56,10 +109,21 @@ export default function RegisterForm() {
     }
 
     // Handle registration logic here
-    setSnackbarMessage('Registration successful!');
-    setSnackbarSeverity('success');
-    setSnackbarOpen(true);
-    console.log('Registration successful:', { email, password });
+    setShowForm(false);
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    setActivationCode(newCode);
+
+    const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
+    const subject = "Activation Code";
+
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: email, subject: subject, text: message }),
+    });
+
   };
 
   const handleCloseSnackbar = () => {
@@ -71,82 +135,136 @@ export default function RegisterForm() {
       <Typography variant="h5" component="h1" gutterBottom>
         Register
       </Typography>
-      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
-        <TextField
-          fullWidth
-          label="Email"
-          variant="outlined"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <AtSymbolIcon className="h-5 w-5" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          type="password"
-          variant="outlined"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <KeyIcon className="h-5 w-5" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <TextField
-          fullWidth
-          label="Confirm Password"
-          type="password"
-          variant="outlined"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <KeyIcon className="h-5 w-5" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
-              color="primary"
-            />
-          }
-          label="I have read and agree to the terms and conditions"
-        />
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Button
+      {showForm ?
+        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+          <TextField
             fullWidth
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{ mb: 2 }}
-          >
-            Register
-          </Button>
-
-          <Link href="/terms-of-use" passHref>
-            <Typography
+            label="Email"
+            variant="outlined"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AtSymbolIcon className="h-5 w-5" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            variant="outlined"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <KeyIcon className="h-5 w-5" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Confirm Password"
+            type="password"
+            variant="outlined"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <KeyIcon className="h-5 w-5" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="I have read and agree to the terms and conditions"
+          />
+          <Box sx={{ mt: 4, textAlign: 'center' }}>
+            <Button
+              fullWidth
+              type="submit"
+              variant="contained"
               color="primary"
-              sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              sx={{ mb: 2 }}
             >
-              Terms of Use
-            </Typography>
-          </Link>
-        </Box>
-      </form>
+              Register
+            </Button>
+
+            <Link href="/terms-of-use" passHref>
+              <Typography
+                color="primary"
+                sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                Terms of Use
+              </Typography>
+            </Link>
+          </Box>
+        </form>
+        :
+        <>
+          <Typography variant="body1" align="center">
+            A verification email has been sent to <strong>{email}</strong> with the <strong>activationCode</strong>.
+            Please check your inbox, and if you do not see the email, kindly check your spam folder.
+          </Typography>
+          <Box sx={{ maxWidth: 400, mx: 'auto', p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {!isVerified ? (
+              <>
+                <Typography variant="h5" gutterBottom>
+                  Verify Your Email
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 2 }}>
+                  Please enter the activation code sent to your email.
+                </Typography>
+                <TextField
+                  label="Activation Code"
+                  variant="outlined"
+                  fullWidth
+                  value={enteredCode}
+                  onChange={(e) => setEnteredCode(e.target.value)}
+                  sx={{ mb: 2 }}
+                />
+                <Button variant="contained" color="primary" onClick={handleSubmitVerify} fullWidth>
+                  Verify Code
+                </Button>
+                <Button
+                  variant="text"
+                  color="secondary"
+                  onClick={handleResendCode}
+                  fullWidth
+                  sx={{ mt: 2 }}
+                  disabled={resendCooldown > 0} // Disabilita il pulsante se c'è un cooldown
+                >
+                  {resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : 'Resend Code'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Typography variant="body1" align="center">
+                  Your email has been successfully verified!
+                </Typography>
+                <Link className="text-blue-700" href="/login" passHref>
+
+                  Proceed to login page
+
+                </Link>
+              </>
+            )}
+          </Box>
+        </>
+      }
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
