@@ -38,14 +38,16 @@ export default function RegisterForm() {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  const handleSubmitVerify = (e: React.FormEvent) => {
+  const handleSubmitVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     // Logica di verifica del codice
     console.log(`EnteredcCode ${enteredCode} - ${activationCode}`)
     if (enteredCode.toString() == activationCode) {
       setIsVerified(true);
 
-      addUsers(email, "USER", password);
+      console.log(`TRY TO ADD USER ${email} ${password}`);
+      await addUsers(email, "USER", password);
+      console.log('USER ADDED');
 
     } else {
       alert('Invalid code, please try again.');
