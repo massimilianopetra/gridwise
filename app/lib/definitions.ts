@@ -24,6 +24,7 @@ export type DbUser = {
   name: string;
   email: string;
   password: string;
+  date: number;
 };
 
 export type GridType = {

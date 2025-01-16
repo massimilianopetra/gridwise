@@ -45,7 +45,7 @@ export default function RegisterForm() {
     if (enteredCode.toString() == activationCode) {
       setIsVerified(true);
 
-      console.log(`TRY TO ADD USER ${email} ${password}`);
+      //console.log(`TRY TO ADD USER ${email} ${password}`);
       await addUsers(email, "USER", password);
       console.log('USER ADDED');
 
@@ -63,7 +63,7 @@ export default function RegisterForm() {
     setActivationCode(newCode);
 
     const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
-    const subject = "Activation Code";
+    const subject = `Activation Code ${activationCode}`;
 
     await fetch('/api/send-email', {
       method: 'POST',

@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     // Validazione dei campi richiesti
     if (!email || !subject || !text) {
-        console.log(`email: ${email} subject:${subject} text: ${text}`)
+      console.log(`email: ${email} subject:${subject} text: ${text}`)
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     // Invio dell'email
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM, // Mittente
-      to: process.env.TEST_EMAIL, // Destinatario (usiamo il campo "email" dal body)
+      to: email, // Destinatario (usiamo il campo "email" dal body)
       subject: subject, // Oggetto
       text: text, // Corpo del messaggio
     });
@@ -39,6 +39,7 @@ export async function POST(req: Request) {
       message: 'Email sent successfully',
       info,
     });
+
   } catch (error) {
     console.error('Error sending email:', error);
     return NextResponse.json(

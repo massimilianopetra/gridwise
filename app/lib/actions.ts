@@ -38,7 +38,8 @@ export async function seedUsers(users: DbUser[]) {
        id SERIAL PRIMARY KEY,
        name VARCHAR(255) NOT NULL,
        email TEXT NOT NULL UNIQUE,
-       password TEXT NOT NULL
+       password TEXT NOT NULL,
+       date BIGINT
      );
    `);
 
@@ -47,11 +48,12 @@ export async function seedUsers(users: DbUser[]) {
   const insertedUsers = await Promise.all(
     users.map(async (user) => {
       const hashedPassword = await bcrypt.hash(user.password, 10);
+      const date_format_millis = Date.now();
 
       try {
         executeQuery(`
-           INSERT INTO gw_users (name, email, password)
-           VALUES ('${user.name}', '${user.email}', '${hashedPassword}')
+           INSERT INTO gw_users (name, email, password, date)
+           VALUES ('${user.name}', '${user.email}', '${hashedPassword}', ${date_format_millis})
            ON CONFLICT (id) DO NOTHING;
         `);
         return "";
@@ -132,7 +134,8 @@ export async function addUsers(email: string, name: string, password: string) {
        id SERIAL PRIMARY KEY,
        name VARCHAR(255) NOT NULL,
        email TEXT NOT NULL UNIQUE,
-       password TEXT NOT NULL
+       password TEXT NOT NULL,
+       date BIGINT
      );
    `);
 
@@ -140,10 +143,11 @@ export async function addUsers(email: string, name: string, password: string) {
 
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const date_format_millis = Date.now();
 
     await executeQuery(`
-           INSERT INTO gw_users (name, email, password)
-           VALUES ('${name}', '${email}', '${hashedPassword}');
+           INSERT INTO gw_users (name, email, password, date)
+           VALUES ('${name}', '${email}', '${hashedPassword}', ${date_format_millis});
   `);
 
 }
