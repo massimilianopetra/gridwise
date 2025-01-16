@@ -108,7 +108,7 @@ export default function RegisterForm() {
       setSnackbarSeverity('error');
       setSnackbarOpen(true);
       return;
-    }s
+    }
 
     // Handle registration logic here
     setShowForm(false);
