@@ -63,7 +63,7 @@ export default function RegisterForm() {
     setActivationCode(newCode);
 
     const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
-    const subject = `Activation Code ${activationCode}`;
+    const subject = `Activation Code ${newCode}`;
 
     await fetch('/api/send-email', {
       method: 'POST',
@@ -116,7 +116,7 @@ export default function RegisterForm() {
     setActivationCode(newCode);
 
     const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
-    const subject = `Activation Code ${activationCode}`;;
+    const subject = `Activation Code ${newCode}`;
 
     await fetch('/api/send-email', {
       method: 'POST',
