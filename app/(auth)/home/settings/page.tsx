@@ -34,21 +34,25 @@ import {
 export default function Page() {
   const [decimalSeparator, setDecimalSeparator] = useState<string>(',');
   const [currency, setCurrency] = useState<string>('EUR');
+  const [geid, setGEID] = useState<string>('10');
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
   // Load preferences from localStorage or set defaults
   useEffect(() => {
     const savedDecimalSeparator = localStorage.getItem('decimalSeparator') || '.';
     const savedCurrency = localStorage.getItem('currency') || 'USD';
+    const savedGEID =  localStorage.getItem('geid') || '10';
 
     setDecimalSeparator(savedDecimalSeparator);
     setCurrency(savedCurrency);
+    setGEID(savedGEID);
   }, []);
 
   // Save preferences to localStorage
   const saveSettings = () => {
     localStorage.setItem('decimalSeparator', decimalSeparator);
     localStorage.setItem('currency', currency);
+    localStorage.setItem('geid', geid);
     setSnackbarOpen(true); // Show Snackbar on save
   };
 
@@ -94,6 +98,23 @@ export default function Page() {
             <MenuItem value="EUR">EUR (€)</MenuItem>
             <MenuItem value="USD">USD ($)</MenuItem>
             <MenuItem value="GBP">GBP (£)</MenuItem>
+          </TextField>
+
+          {/* Currency Field */}
+          <Typography className="text-blue-900" variant="body1" sx={{ mt: 3, mb: 1 }}>
+            Grid Engine Iterator Default
+          </Typography>
+          <TextField
+            select
+            fullWidth
+            variant="standard"
+            value={geid}
+            onChange={(e) => setGEID(e.target.value)}
+          >
+            <MenuItem value="1">1 Iteration </MenuItem>
+            <MenuItem value="5">5 Iteration</MenuItem>
+            <MenuItem value="10">10 Iteration</MenuItem>
+            <MenuItem value="20">20 Iteration</MenuItem>
           </TextField>
 
           <Box sx={{ mt: 4, textAlign: 'center' }}>

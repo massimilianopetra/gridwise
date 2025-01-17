@@ -77,14 +77,17 @@ export default function Page() {
   });
   const [decimalSeparator, setDecimalSeparator] = useState<string>(',');
   const [currency, setCurrency] = useState<string>('EUR');
+  const [geid, setGEID] = useState<string>('10');
 
   // Load preferences from localStorage or set defaults
   useEffect(() => {
     const savedDecimalSeparator = localStorage.getItem('decimalSeparator') || '.';
     const savedCurrency = localStorage.getItem('currency') || 'USD';
+    const savedGEID =  localStorage.getItem('geid') || '10';
 
     setDecimalSeparator(savedDecimalSeparator);
     setCurrency(savedCurrency);
+    setGEID(savedGEID);
   }, []);
 
 
@@ -167,7 +170,7 @@ export default function Page() {
     const Pb = parseFloat(inputPbRef.current?.value || '0');
     const P = parseFloat(inputPRef.current?.value || '0');
     const n = parseFloat(inputNGridRef.current?.value || '0');
-    const iteration = parseFloat(inputNIterationRef.current?.value || '10');
+    const iteration = parseFloat(inputNIterationRef.current?.value || geid);
 
     // Controllo congruenza parametri
     if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {

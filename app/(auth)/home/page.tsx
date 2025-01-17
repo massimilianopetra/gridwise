@@ -25,17 +25,7 @@ export default function HomePage() {
           descriptionPadding={20}
         />
       </div>
-      <Box
-        sx={{
-          minHeight: '100vh',
-          backgroundColor: '#f7f7f7',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 3,
-        }}
-      >
+      <Box className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-3">
 
         {/* Titolo principale */}
         <Typography className ="text-black text-center font-bold text-6xl">
