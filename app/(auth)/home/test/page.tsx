@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent, List, ListItem, ListItemText, Button, Divider } from '@mui/material';
 
-
+export default function Page() {
   return (
     <main>
 
