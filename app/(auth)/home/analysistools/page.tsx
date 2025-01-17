@@ -115,9 +115,10 @@ export default function Page() {
     <div style={{ height: 250, width: '100%' }}>
 
       <br></br>
-      <div className='space-y-6'>
-        <Typography className="text-blue-900 text-center" variant="h5" gutterBottom>
-          Graph Tools
+      <div className="max-w-full h-60 space-y-6">
+        {/* Titolo principale */}
+        <Typography className ="text-black text-center font-bold text-6xl">
+          Analysis Tools
         </Typography>
         <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
           <Typography className="text-blue-900 text-center" variant="h5" gutterBottom>

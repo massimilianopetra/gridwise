@@ -18,11 +18,11 @@ export default function NavLinks() {
     const pathname = usePathname();
     var links = undefined;
 
-    
+
     links = [{ name: 'Home', href: '/home', icon: HomeIcon },
-             { name: 'LiquidityPool', href: '/home/liquidity', icon: WaterDropIcon},
-             { name: 'GridTrading', href: '/home/gridtrading', icon: ViewHeadlineIcon},
-             { name: 'GraphTools', href: '/home/graphtools', icon: InsightsIcon},];
+    { name: 'AnalysisTools', href: '/home/analysistools', icon: InsightsIcon },
+    { name: 'GridTrading', href: '/home/gridtrading', icon: ViewHeadlineIcon },
+    { name: 'LiquidityPool', href: '/home/liquidity', icon: WaterDropIcon },];
 
     return (
         <>

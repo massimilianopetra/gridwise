@@ -38,14 +38,7 @@ export default function HomePage() {
       >
 
         {/* Titolo principale */}
-        <Typography
-          variant="h2"
-          component="h1"
-          gutterBottom
-          fontWeight="bold"
-          textAlign="center"
-          sx={{ mb: 6 }}
-        >
+        <Typography className ="text-black text-center font-bold text-6xl">
           Welcome to OpenTradeNet
         </Typography>
 

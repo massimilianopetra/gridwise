@@ -133,8 +133,8 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="flex flex-col items-center p-4">
-      <Typography variant="h5" component="h1" gutterBottom>
+    <div className="flex flex-col items-center p-4 bg-white">
+      <Typography className="text-black mb-4 text-4xl">
         Register
       </Typography>
       {showForm ?
@@ -184,6 +184,7 @@ export default function RegisterForm() {
             }}
           />
           <FormControlLabel
+            className='text-black text-xs'
             control={
               <Checkbox
                 checked={termsAccepted}

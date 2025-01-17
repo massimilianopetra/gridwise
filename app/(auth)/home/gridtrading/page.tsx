@@ -326,7 +326,7 @@ export default function Page() {
 
 
   return (
-    <div style={{ height: 250, width: '100%' }}>
+    <div className="max-w-full h-60">
       <div style={{ padding: "20px" }}>
         <Marquee
           stocks={stock}
@@ -335,6 +335,10 @@ export default function Page() {
         />
       </div>
       <br></br>
+      {/* Titolo principale */}
+      <Typography className="text-black text-center font-bold text-6xl">
+        Grid Trading
+      </Typography>
       <div className='space-y-6'>
         <Card sx={{ maxWidth: 600, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
           <CardContent>
