@@ -69,6 +69,7 @@ export default function Page() {
   const inputNGridRef = useRef<HTMLInputElement>(null);
   const inputNIterationRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputAlreadyOwned = useRef<HTMLInputElement>(null);
   const [flags, setFlags] = useState({
     buyOnGrid: false,
     sellOnGrid: false,
@@ -83,7 +84,7 @@ export default function Page() {
   useEffect(() => {
     const savedDecimalSeparator = localStorage.getItem('decimalSeparator') || '.';
     const savedCurrency = localStorage.getItem('currency') || 'USD';
-    const savedGEID =  localStorage.getItem('geid') || '10';
+    const savedGEID = localStorage.getItem('geid') || '10';
 
     setDecimalSeparator(savedDecimalSeparator);
     setCurrency(savedCurrency);
@@ -350,6 +351,7 @@ export default function Page() {
             </Typography>
             <div className='flex flex-row space-x-4'>
               <TextField
+                required
                 className='bg-white rounded-md'
                 inputRef={inputInvestmentRef}
                 type="number"
@@ -361,6 +363,7 @@ export default function Page() {
                 }}
               />
               <TextField
+                required
                 className='bg-white rounded-md'
                 inputRef={inputPRef}
                 type="number"
@@ -374,6 +377,7 @@ export default function Page() {
             </div>
             <div className='flex flex-row space-x-4'>
               <TextField
+                required
                 className='bg-white rounded-md'
                 inputRef={inputPaRef}
                 type="number"
@@ -385,6 +389,7 @@ export default function Page() {
                 }}
               />
               <TextField
+                required
                 className='bg-white rounded-md'
                 inputRef={inputPbRef}
                 type="number"
@@ -398,7 +403,8 @@ export default function Page() {
             </div>
             <div className='flex flex-row space-x-4'>
               <TextField
-                className='bg-white rounded-md max-w-28'
+                required
+                className='bg-white rounded-md max-w-32'
                 inputRef={inputNGridRef}
                 type="number"
 
@@ -429,6 +435,17 @@ export default function Page() {
                 }}
                 fullWidth
                 margin="normal"
+              />
+              <TextField
+                className='bg-white rounded-md max-w-52'
+                inputRef={inputAlreadyOwned}
+                type="number"
+                label="Already Owned Shares"
+                fullWidth
+                margin="normal"
+                slotProps={{
+                  inputLabel: { shrink: true },
+                }}
               />
             </div>
           </CardContent>

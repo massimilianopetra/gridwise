@@ -102,7 +102,7 @@ export default function Page() {
 
           {/* Currency Field */}
           <Typography className="text-blue-900" variant="body1" sx={{ mt: 3, mb: 1 }}>
-            Grid Engine Iterator Default
+            Grid Engine Iteration Default
           </Typography>
           <TextField
             select

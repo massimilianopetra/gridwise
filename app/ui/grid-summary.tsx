@@ -19,12 +19,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import React, { useState, useEffect } from 'react';
 import { Card, Typography, Box, Grid, TextField } from '@mui/material';
 import { GridType } from '@/app/lib/definitions';
 
 
 
 export default function GridSummary({ rows, investment, P }: { rows: GridType[], investment: number, P: number }) {
+
+
+  const [currency, setCurrency] = useState<string>('EUR');
+
+
+  // Load preferences from localStorage or set defaults
+  useEffect(() => {
+    const savedCurrency = localStorage.getItem('currency') || 'USD';
+
+    setCurrency(savedCurrency);
+ 
+  }, []);
+
   let qty = 0;
   let initInvestent = 0;
   let future = 0;
@@ -39,14 +53,14 @@ export default function GridSummary({ rows, investment, P }: { rows: GridType[],
   });
 
   const fields = [
-    { label: "Proposed investment", value: investment.toFixed(2) },
+    { label: "Proposed investment", value: investment.toFixed(2) +` ${currency}`},
     { label: "Quantity purchased immediately", value: qty.toFixed(5) },
-    { label: "Capital allocated for the purchase", value: initInvestent.toFixed(2) },
-    { label: "Reserved allocation for future purchases", value: future.toFixed(2) },
-    { label: "Residual capital not invested", value: (investment - initInvestent - future).toFixed(2) },
-    { label: "Estimated max grid profit", value: (rows[0].earn * 2.5 * rows.length).toFixed(2) },
+    { label: "Capital allocated for the purchase", value: initInvestent.toFixed(2)+` ${currency}` },
+    { label: "Reserved allocation for future purchases", value: future.toFixed(2) +` ${currency}`},
+    { label: "Residual capital not invested", value: (investment - initInvestent - future).toFixed(2) +` ${currency}`},
+    { label: "Estimated max strategy profit", value: (rows[0].earn * 2.5 * rows.length).toFixed(2) +` ${currency}`},
     { label: "N. Grid ", value: rows.length },
-    { label: "Single Grid Profit", value: rows[0].earn.toFixed(4) },
+    { label: "Single Grid Profit", value: rows[0].earn.toFixed(4) +` ${currency}`},
     { label: "Grid Step", value: (100 * rows[0].earn / (rows[0].buyPrice*rows[0].Quantity)).toFixed(2)+"%" },
 
   ];
@@ -64,7 +78,7 @@ export default function GridSummary({ rows, investment, P }: { rows: GridType[],
             {fields.map((field, index) => (
               <Grid item xs={4} key={index}>
                 <Box>
-                  <Typography variant="body1" sx={{ marginBottom: 1 }}>
+                  <Typography className='text-black' sx={{ marginBottom: 1 }}>
                     {field.label}
                   </Typography>
                   <TextField

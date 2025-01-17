@@ -59,6 +59,9 @@ const CsvFileReader: React.FC<CsvFileReaderProps> = ({ onFileLoad }) => {
 
                 setError(null);
                 onFileLoad(parsedRows);
+                // Resetta il valore per consentire la selezione dello stesso file
+                event.target.value = "";
+
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Unknown error.");
             }

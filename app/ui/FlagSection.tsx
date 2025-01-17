@@ -30,8 +30,8 @@ const FlagSection: React.FC<FlagSectionProps> = ({ onFlagsChange, onCommissionCh
     buyOnGrid: false,
     sellOnGrid: false,
   });
-  const [commissionPercentage, setCommissionPercentage] = useState("");
-  const [fixedCommission, setFixedCommission] = useState("");
+  const [commissionPercentage, setCommissionPercentage] = useState("0");
+  const [fixedCommission, setFixedCommission] = useState("0");
 
   const handleFlagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const updatedFlags = { ...flags, [event.target.name]: event.target.checked };
