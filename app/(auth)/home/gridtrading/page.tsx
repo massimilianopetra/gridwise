@@ -167,7 +167,7 @@ export default function Page() {
     const Pb = parseFloat(inputPbRef.current?.value || '0');
     const P = parseFloat(inputPRef.current?.value || '0');
     const n = parseFloat(inputNGridRef.current?.value || '0');
-    const iteration = parseFloat(inputNIterationRef.current?.value || '1');
+    const iteration = parseFloat(inputNIterationRef.current?.value || '10');
 
     // Controllo congruenza parametri
     if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {

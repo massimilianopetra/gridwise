@@ -26,7 +26,6 @@ import { GridType } from '@/app/lib/definitions';
 import { convertToCSV } from '../lib/utility';
 
 
-
 export default function GridTable({ rows }: { rows: GridType[] }) {
 
   const [decimalSeparator, setDecimalSeparator] = useState<string>(',');

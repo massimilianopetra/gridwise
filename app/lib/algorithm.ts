@@ -21,6 +21,13 @@ import { GridType, StockData, FlagSectionData, StrategyResult } from '@/app/lib/
 
 export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number,selPercentage: boolean, selInteger: boolean): GridType[] {
 
+    console.log (selPercentage);
+
+    if (selPercentage) {
+        const percentage = 1+(n/100);
+        n =  Math.floor(Math.log10(Pb/Pa)/Math.log10(percentage));
+        console.log(n);
+    }
     const grid_gain = (Pb / Pa) ** (1 / n);
     var result: GridType[] = [];
 
