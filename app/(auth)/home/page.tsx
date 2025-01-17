@@ -28,7 +28,7 @@ export default function HomePage() {
       <Box className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-3">
 
         {/* Titolo principale */}
-        <Typography className ="text-black text-center font-bold text-6xl">
+        <Typography className ="text-black text-center font-bold " style={{ fontSize: '4rem' }}>
           Welcome to OpenTradeNet
         </Typography>
 

@@ -18,12 +18,16 @@
  */
 
 import LiquidityCard from '@/app/ui/liquidity-card';
+import { Box, Typography, Card, CardContent, List, ListItem, ListItemText, Button, Divider } from '@mui/material';
 
 export default function Home() {
   return (
     <div style={{ height: 250, width: '100%' }}>
       <main>
         <h1>
+          <Typography className="text-black text-center font-bold " style={{ fontSize: '4rem' }}>
+            Liquidity Pool Tools
+          </Typography>
           <LiquidityCard />
         </h1>
       </main>

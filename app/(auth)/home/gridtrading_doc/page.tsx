@@ -39,7 +39,7 @@ export default function HomePage() {
                 }}
             >
                 {/* Titolo principale */}
-                <Typography className ="text-black text-center font-bold text-6xl">
+                <Typography className ="text-black text-center font-bold " style={{ fontSize: '4rem' }} >
                     OpenTradeNet Academy
                 </Typography>
 

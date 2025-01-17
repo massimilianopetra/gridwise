@@ -117,7 +117,7 @@ export default function Page() {
       <br></br>
       <div className="max-w-full h-60 space-y-6">
         {/* Titolo principale */}
-        <Typography className ="text-black text-center font-bold text-6xl">
+        <Typography className ="text-black text-center font-bold " style={{ fontSize: '4rem' }}>
           Analysis Tools
         </Typography>
         <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>

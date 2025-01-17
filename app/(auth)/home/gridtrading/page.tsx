@@ -339,7 +339,7 @@ export default function Page() {
       </div>
       <br></br>
       {/* Titolo principale */}
-      <Typography className="text-black text-center font-bold text-6xl">
+      <Typography className="text-black text-center font-bold " style={{ fontSize: '4rem' }}>
         Grid Trading
       </Typography>
       <div className='space-y-6'>
