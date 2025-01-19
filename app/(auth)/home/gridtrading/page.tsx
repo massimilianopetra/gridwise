@@ -119,6 +119,7 @@ export default function Page() {
             id: 0,
             Quantity: 0,
             buyPrice: 0,
+            effectiveBuyPrice: 0,
             capital: 0,
             sellPrice: 0,
             earn: 0,
