@@ -31,6 +31,7 @@ export type GridType = {
   id: number;
   Quantity: number;
   buyPrice: number;
+  effectiveBuyPrice: number;
   capital: number;
   sellPrice: number;
   earn: number;

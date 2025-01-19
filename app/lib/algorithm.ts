@@ -18,7 +18,6 @@
  */
 
 import { GridType, StockData, FlagSectionData, StrategyResult } from '@/app/lib/definitions';
-import { log } from 'console';
 
 export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number,selPercentage: boolean, selInteger: boolean, aleady=0): GridType[] {
 
@@ -46,9 +45,9 @@ export function GometricGrid(investment: number, Pa: number, Pb: number, P: numb
                 const qty = (investment / n) / priceBuy
                 const earn = qty * (priceSell - priceBuy);
                 if (P > priceBuy) {
-                    local_result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: false });
+                    local_result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, effectiveBuyPrice: 0, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: false });
                 } else {
-                    local_result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: true });
+                    local_result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, effectiveBuyPrice: P, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: true });
                     saved += (priceBuy - P) * qty;
                 }
             }
@@ -141,7 +140,6 @@ export function GridStrategy(
         fixedCommission: "0",
     }): StrategyResult {
     let gridprofit = 0;
-    let saved = 0;
     let _grid = grid;
     let totInvest = 0;
     let liquidity = 0;
@@ -151,18 +149,17 @@ export function GridStrategy(
         _grid = _grid.map((g) => {
             if (e.value < g.buyPrice && g.status == false) {
                 const price = flags.buyOnGrid ? g.buyPrice : e.value;
-                saved += (g.buyPrice - price) * g.Quantity;
                 const commision = Math.max(price*g.Quantity*parseFloat(flags.commissionPercentage)/100.0,parseFloat(flags.fixedCommission));
                 gridprofit -= commision;
-                return ({ ...g, status: true });
+                return ({ ...g, effectiveBuyPrice: price, status: true });
             } else {
                 if (e.value > g.sellPrice && g.status == true) {
                     const price = flags.sellOnGrid ? g.sellPrice : e.value;
                     profitableTrades += 1;
                     const commision = Math.max(price*g.Quantity*parseFloat(flags.commissionPercentage)/100.0,parseFloat(flags.fixedCommission));
                     console.log(`S BUY ${commision}`);
-                    gridprofit += (price - g.buyPrice) * g.Quantity - commision;
-                    return ({ ...g, status: false });
+                    gridprofit += (price - g.effectiveBuyPrice) * g.Quantity - commision;
+                    return ({ ...g, effectiveBuyPrice: 0, status: false });
                 } else {
                     return ({ ...g });
                 }
@@ -181,7 +178,7 @@ export function GridStrategy(
 
         });
 
-        return ({ time: e.time, value: totInvest + liquidity + gridprofit + saved });
+        return ({ time: e.time, value: totInvest + liquidity + gridprofit});
     });
 
     console.log({profitableTrades: profitableTrades, gridProfit: gridprofit})
@@ -198,7 +195,6 @@ export function GridBackTesting(
         fixedCommission: "0",
     }): string[] {
     let gridprofit = 0;
-    let saved = 0;
     let _grid = grid;
     let result = []
     let lastPrice = 0
@@ -217,10 +213,9 @@ export function GridBackTesting(
                 // Price below the grid, and grid not owned: must buy
                 const price = flags.buyOnGrid ? g.buyPrice : e.value;
                 result.push(`${e.time} buy at price ${price} grid n. ${g.id}`);
-                saved += (g.buyPrice - price) * g.Quantity;
                 const commision = Math.max(price*g.Quantity*parseFloat(flags.commissionPercentage)/100.0,parseFloat(flags.fixedCommission));
                 gridprofit -= commision;
-                return ({ ...g, status: true });
+                return ({ ...g, effectiveBuyPrice: price, status: true });
             } else {
                 const price = flags.sellOnGrid ? g.sellPrice : e.value;
                 // Price above the grid, and grid owned: must sell
@@ -228,8 +223,8 @@ export function GridBackTesting(
                     result.push(`${e.time} sell at price ${price} grid n. ${g.id}`)
                     const commision = Math.max(price*g.Quantity*parseFloat(flags.commissionPercentage)/100.0,parseFloat(flags.fixedCommission));
                     console.log(`BUY ${commision}`);
-                    gridprofit += (price - g.buyPrice) * g.Quantity - commision;
-                    return ({ ...g, status: false });
+                    gridprofit += (price - g.effectiveBuyPrice) * g.Quantity - commision;
+                    return ({ ...g, effectiveBuyPrice:0, status: false });
                 } else {
                     return ({ ...g });
                 }
@@ -239,7 +234,6 @@ export function GridBackTesting(
 
     result.push(`----------------------------------`);
     result.push(`Total grid profit: ${gridprofit.toFixed(2)}`);
-    result.push(`Total saved capital: ${saved.toFixed(2)}`);
 
     _grid = _grid.map((g) => {
         if (g.status == true) {
