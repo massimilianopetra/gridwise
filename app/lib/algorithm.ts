@@ -147,6 +147,10 @@ export function GridStrategy(
     let quantity = 0;
     let pcarico = 0;
 
+    console.log("***************************************");
+    console.log(flags);
+    console.log("***************************************");
+    
     _grid = _grid.map((g) => {
         if (g.status == false) {
             liquidity += g.Quantity * g.buyPrice;
@@ -211,8 +215,7 @@ export function GridBackTesting(
     let pcarico = 0;
 
     console.log("***************************************");
-    console.log(parseFloat(flags.commissionPercentage));
-    console.log(parseFloat(flags.fixedCommission));
+    console.log(flags);
     console.log("***************************************");
 
     _grid = _grid.map((g) => {

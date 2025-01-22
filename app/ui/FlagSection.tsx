@@ -27,8 +27,8 @@ interface FlagSectionProps {
 
 const FlagSection: React.FC<FlagSectionProps> = ({ onFlagsChange, onCommissionChange }) => {
   const [flags, setFlags] = useState({
-    buyOnGrid: false,
-    sellOnGrid: false,
+    buyOnGrid: true,
+    sellOnGrid: true,
   });
   const [commissionPercentage, setCommissionPercentage] = useState("0");
   const [fixedCommission, setFixedCommission] = useState("0");
