@@ -71,8 +71,8 @@ export default function Page() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputAlreadyOwned = useRef<HTMLInputElement>(null);
   const [flags, setFlags] = useState({
-    buyOnGrid: false,
-    sellOnGrid: false,
+    buyOnGrid: true,
+    sellOnGrid: true,
     commissionPercentage: "0",
     fixedCommission: "0",
   });
