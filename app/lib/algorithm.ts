@@ -142,8 +142,20 @@ export function GridStrategy(
     let gridprofit = 0;
     let _grid = grid;
     let totInvest = 0;
-    let liquidity = 0;
     let profitableTrades = 0;
+    let liquidity = 0;
+    let quantity = 0;
+    let pcarico = 0;
+
+    _grid = _grid.map((g) => {
+        if (g.status == false) {
+            liquidity += g.Quantity * g.buyPrice;
+        } else {
+            quantity += g.Quantity;
+            pcarico = g.effectiveBuyPrice;
+        }
+        return ({ ...g });
+    })
 
     const result = csv.map((e) => {
         _grid = _grid.map((g) => {
@@ -151,34 +163,32 @@ export function GridStrategy(
                 const price = flags.buyOnGrid ? g.buyPrice : e.value;
                 const commision = Math.max(price*g.Quantity*parseFloat(flags.commissionPercentage)/100.0,parseFloat(flags.fixedCommission));
                 gridprofit -= commision;
+                liquidity -= price*g.Quantity;
+                pcarico = (pcarico*quantity+price*g.Quantity)/(quantity+g.Quantity);
+                quantity += g.Quantity;
+                console.log(`${e.time} price=${e.value} liquidity=${liquidity} quantity=${quantity} pcarico=${pcarico} gprofit=${gridprofit} BUY at price ${price} grid n. ${g.id}`);
                 return ({ ...g, effectiveBuyPrice: price, status: true });
             } else {
                 if (e.value > g.sellPrice && g.status == true) {
                     const price = flags.sellOnGrid ? g.sellPrice : e.value;
                     profitableTrades += 1;
                     const commision = Math.max(price*g.Quantity*parseFloat(flags.commissionPercentage)/100.0,parseFloat(flags.fixedCommission));
-                    console.log(`S BUY ${commision}`);
                     gridprofit += (price - g.effectiveBuyPrice) * g.Quantity - commision;
+                    liquidity += price*g.Quantity - commision;
+                    quantity -= g.Quantity;
+                    if (quantity == 0) {
+                        pcarico = 0;
+                    }
+                    console.log(`${e.time} price=${e.value} liquidity=${liquidity} quantity=${quantity} pcarico=${pcarico} gprofit=${gridprofit} SELL at price ${price} grid n. ${g.id}`);
                     return ({ ...g, effectiveBuyPrice: 0, status: false });
                 } else {
+                    console.log(`${e.time} price=${e.value} liquidity=${liquidity} quantity=${quantity} pcarico=${pcarico} gprofit=${gridprofit} NOTHING for grid n. ${g.id}`);
                     return ({ ...g });
                 }
             }
         });
 
-        totInvest = 0;
-        liquidity = 0;
-        _grid.forEach((g) => {
-            if (g.status == true) {
-
-                totInvest += g.Quantity * e.value;
-            } else {
-                liquidity += g.Quantity * g.buyPrice;
-            }
-
-        });
-
-        return ({ time: e.time, value: totInvest + liquidity + gridprofit});
+        return ({ time: e.time, value: liquidity + quantity*e.value});
     });
 
     console.log({profitableTrades: profitableTrades, gridProfit: gridprofit})
@@ -196,8 +206,6 @@ export function GridBackTesting(
     }): string[] {
     let gridprofit = 0;
     let _grid = grid;
-    let lastPrice = 0
-    let totInvest = 0;
     let liquidity = 0;
     let quantity = 0;
     let pcarico = 0;
@@ -218,7 +226,6 @@ export function GridBackTesting(
     })
     
     csv.forEach((e) => {
-        lastPrice = e.value;
         _grid = _grid.map((g) => {
             if (e.value < g.buyPrice && g.status == false) {
                 // Price below the grid, and grid not owned: must buy
@@ -228,7 +235,6 @@ export function GridBackTesting(
                 liquidity -= price*g.Quantity;
                 pcarico = (pcarico*quantity+price*g.Quantity)/(quantity+g.Quantity);
                 quantity += g.Quantity;
-                console.log(`${e.time} price=${e.value} liquidity=${liquidity} quantity=${quantity} pcarico=${pcarico} gprofit=${gridprofit} BUY at price ${price} grid n. ${g.id}`);
                 return ({ ...g, effectiveBuyPrice: price, status: true });
             } else {
                 const price = flags.sellOnGrid ? g.sellPrice : e.value;
@@ -238,10 +244,8 @@ export function GridBackTesting(
                     gridprofit += (price - g.effectiveBuyPrice) * g.Quantity - commision;
                     liquidity += price*g.Quantity - commision;
                     quantity -= g.Quantity;
-                    console.log(`${e.time} price=${e.value} liquidity=${liquidity} quantity=${quantity} pcarico=${pcarico} gprofit=${gridprofit} SELL at price ${price} grid n. ${g.id}`);
                     return ({ ...g, effectiveBuyPrice:0, status: false });
                 } else {
-                    console.log(`${e.time} price=${e.value} liquidity=${liquidity} quantity=${quantity} pcarico=${pcarico} gprofit=${gridprofit} NOTHING for grid n. ${g.id}`);
                     return ({ ...g });
                 }
             }
