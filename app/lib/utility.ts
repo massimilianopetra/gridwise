@@ -17,6 +17,7 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
+
 // Funzione per convertire i dati in CSV con il separatore specificato
 export function convertToCSV(data: any[], decimalSeparator: string): string {
   if (!data || data.length === 0) return '';
