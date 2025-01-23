@@ -1,9 +1,9 @@
 
 import { NextResponse } from "next/server";
-import { getToken } from '@/app/lib/token';
+
 
 export async function GET(req: Request) {
-  const token = await getToken();
+  const token = ""
   try {
 
     // Se l'utente è autenticato, restituisci il messaggio
