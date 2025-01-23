@@ -17,6 +17,49 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { StockMarketQuote } from '@/app/lib/definitions';
+import { getAllCryptoPrice } from '@/app/lib/actions';
+
+// GetCryptoQuote
+export async function GetCryptoQuote():Promise<StockMarketQuote[]> {
+  var stock: StockMarketQuote[] = [];
+  const value = await getAllCryptoPrice();
+
+  value.forEach(element => {
+    if (element.symbol == "BTC_USDT") {
+      stock.push({ symbol: "BTC", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "SOL_USDT") {
+      stock.push({ symbol: "SOL", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "ETH_USDT") {
+      stock.push({ symbol: "ETH", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "XRP_USDT") {
+      stock.push({ symbol: "XRP", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "BNB_USDT") {
+      stock.push({ symbol: "BNB", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "DOGE_USDT") {
+      stock.push({ symbol: "DOGE", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "ADA_USDT") {
+      stock.push({ symbol: "ADA", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "TRX_USDT") {
+      stock.push({ symbol: "TRX", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "LINK_USDT") {
+      stock.push({ symbol: "LINK", price: element.price, change: 100 * (element.dailyChange) })
+    }
+    if (element.symbol == "AVAX_USDT") {
+      stock.push({ symbol: "AVAX", price: element.price, change: 100 * (element.dailyChange) })
+    }
+  });
+
+  return stock;
+}
 
 // Funzione per convertire i dati in CSV con il separatore specificato
 export function convertToCSV(data: any[], decimalSeparator: string): string {

@@ -19,22 +19,19 @@
 
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { StockMarketQuote } from "../lib/definitions";
 
-type StockData = {
-  symbol: string;
-  change: number;
-};
 
 interface MarqueeProps {
-  stocks: StockData[];
+  stocks: StockMarketQuote[];
   description?: string; // Scritta descrittiva opzionale
   descriptionPadding?: number; // Numero di spazi bianchi prima della descrizione
 }
 
-const Marquee: React.FC<MarqueeProps> = ({ 
-  stocks, 
-  description = "Stocks:", 
-  descriptionPadding = 5 
+const Marquee: React.FC<MarqueeProps> = ({
+  stocks,
+  description = "Stocks:",
+  descriptionPadding = 5
 }) => {
   // Creiamo uno spazio bianco personalizzabile prima della descrizione
   const paddedDescription = `${" ".repeat(descriptionPadding)}${description}`;
@@ -57,7 +54,7 @@ const Marquee: React.FC<MarqueeProps> = ({
         sx={{
           display: "flex",
           whiteSpace: "nowrap",
-          animation: "scroll 15s linear infinite",
+          animation: "scroll 30s linear infinite",
         }}
       >
         {/* Scritta Descrittiva */}
@@ -91,7 +88,7 @@ const Marquee: React.FC<MarqueeProps> = ({
                 fontWeight: "bold",
               }}
             >
-              {stock.symbol}{" "}
+              {stock.symbol}{" "}{stock.price}{" "}
               <span
                 style={{
                   marginLeft: "8px",

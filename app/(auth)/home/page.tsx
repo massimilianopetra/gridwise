@@ -1,20 +1,34 @@
 'use client'
 
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, List, ListItem, ListItemText, Button, Divider } from '@mui/material';
 import Link from 'next/link';
 import Marquee from "@/app/ui/Marquee";
+import { StockMarketQuote } from '@/app/lib/definitions';
+import { GetCryptoQuote } from '@/app/lib/utility';
 
 export default function HomePage() {
 
-  const stock = [
-    { symbol: "AAPL", change: +2.5 },
-    { symbol: "TSLA", change: -3.7 },
-    { symbol: "AMZN", change: +1.2 },
-    { symbol: "GOOGL", change: -0.8 },
-    { symbol: "META", change: -2.3 },
-    { symbol: "NFLX", change: +0.5 },
-  ];
+const [stock,setStock] = useState<StockMarketQuote[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const stock = await GetCryptoQuote();
+      setStock(stock);
+    };
+
+    // Call fetchData immediately
+    fetchData();
+
+    // Set an interval to call fetchData every minute (60000 ms)
+    const interval = setInterval(() => {
+      fetchData();
+    }, 60000);
+
+    // Cleanup function to clear interval
+    return () => clearInterval(interval);
+}, []);
 
   return (
     <main>

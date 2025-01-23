@@ -43,6 +43,12 @@ export type StockData = {
   value: number
 }
 
+export type StockMarketQuote = {
+  symbol: string;
+  price: number;
+  change: number;
+};
+
 export type StrategyResult = {
   stockdata: StockData[],
   summary: any

@@ -37,6 +37,8 @@ import { StockData } from '@/app/lib/definitions'
 import TradingChart from '@/app/ui/TradingChart';
 import FlagSection from '@/app/ui/FlagSection';
 import Marquee from "@/app/ui/Marquee";
+import { StockMarketQuote } from '@/app/lib/definitions';
+import { GetCryptoQuote } from '@/app/lib/utility';
 
 interface ISummary {
   profitableTrades: number,
@@ -79,6 +81,8 @@ export default function Page() {
   const [decimalSeparator, setDecimalSeparator] = useState<string>(',');
   const [currency, setCurrency] = useState<string>('EUR');
   const [geid, setGEID] = useState<string>('10');
+  const [stock,setStock] = useState<StockMarketQuote[]>([]);
+
 
   // Load preferences from localStorage or set defaults
   useEffect(() => {
@@ -89,17 +93,24 @@ export default function Page() {
     setDecimalSeparator(savedDecimalSeparator);
     setCurrency(savedCurrency);
     setGEID(savedGEID);
+
+    const fetchData = async () => {
+      const stock = await GetCryptoQuote();
+      setStock(stock);
+    };
+
+    // Call fetchData immediately
+    fetchData();
+
+    // Set an interval to call fetchData every minute (60000 ms)
+    const interval = setInterval(() => {
+      fetchData();
+    }, 60000);
+
+    // Cleanup function to clear interval
+    return () => clearInterval(interval);
   }, []);
 
-
-  const stock = [
-    { symbol: "AAPL", change: +2.5 },
-    { symbol: "TSLA", change: -3.7 },
-    { symbol: "AMZN", change: +1.2 },
-    { symbol: "GOOGL", change: -0.8 },
-    { symbol: "META", change: -2.3 },
-    { symbol: "NFLX", change: +0.5 },
-  ];
 
   const handleButtonImport = () => {
     fileInputRef.current?.click();

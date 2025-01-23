@@ -54,6 +54,35 @@ export async function getValueByKey(key: string): Promise<string | null> {
   return value;
 }
 
+export async function getAllCryptoPrice(): Promise<[any]> {
+
+  // All symbol https://api.poloniex.com/markets
+  // All https://api.poloniex.com/markets/price
+  
+  const response = await fetch(`https://api.poloniex.com/markets/price`, {
+    method: 'GET',
+    headers: {},
+  });
+  const data = await response.json();
+
+  return (data);
+}
+
+export async function getCurrentStockValue(stockSymbol: string): Promise<any> {
+
+  // All symbol https://api.poloniex.com/markets
+  // All https://api.poloniex.com/markets/price
+
+  const response = await fetch(`https://api.poloniex.com/markets/${stockSymbol}/price`, {
+    method: 'GET',
+    headers: {},
+  });
+  const data = await response.json();
+  console.log(data);
+
+  return ({ value: 0 });
+}
+
 
 /* ************************ SEED DATABASE **************************** */
 
