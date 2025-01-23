@@ -17,22 +17,6 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { cookies } from "next/headers";
-
-export async function setToken(): Promise<string> {
-
-    const sessionToken = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log(`Generate new token ${sessionToken}`);
-    (await cookies()).set("token", sessionToken);
-    return sessionToken;
-}
-
-export async function getToken(): Promise<string|undefined> {
-    const  sessionToken = (await cookies()).get("token");
-    console.log(`GeReaded token is ${sessionToken?.value}`);
-
-    return sessionToken?.value;
-}
 
 // Funzione per convertire i dati in CSV con il separatore specificato
 export function convertToCSV(data: any[], decimalSeparator: string): string {
