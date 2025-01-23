@@ -53,7 +53,6 @@ export default function RegisterForm() {
       console.log('USER ADDED');
 
     } else {
-      alert('Invalid code, please try again.');
       setSnackbarMessage('Invalid code, please try again.');
       setSnackbarSeverity('error');
       setSnackbarOpen(true);

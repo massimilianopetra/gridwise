@@ -26,8 +26,8 @@ export async function POST(req: Request) {
     console.log(`*** send activation code ***`);
     console.log(`email: ${email} subject:${subject} text: ${message}`);
 
-    await setKeyValue(email,newCode);
-
+    await setKeyValue(email,newCode,600);
+  
     // Validazione dei campi richiesti
     if (!email) {
       

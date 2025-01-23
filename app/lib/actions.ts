@@ -36,8 +36,11 @@ const redis = new Redis({
   token: process.env.KV_REST_API_TOKEN,
 })
 
-export async function setKeyValue(key: string, value: string) {
+export async function setKeyValue(key: string, value: string, expire?: number) {
   await redis.set(key, value);
+  if (expire) {
+    await redis.expireat(key, Math.floor(Date.now() / 1000) + expire);
+  }
 }
 
 export async function getValueByKey(key: string): Promise<string | null> {
@@ -47,9 +50,10 @@ export async function getValueByKey(key: string): Promise<string | null> {
 
   // Recupera il valore associato alla chiave
   const value = await redis.get<string>(key);
-   
+
   return value;
 }
+
 
 /* ************************ SEED DATABASE **************************** */
 
@@ -163,10 +167,10 @@ export async function addUsers(email: string, name: string, password: string) {
   console.log(`CREATED TABLE gw_users`);
 
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const date_format_millis = Date.now();
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const date_format_millis = Date.now();
 
-    await executeQuery(`
+  await executeQuery(`
            INSERT INTO gw_users (name, email, password, date)
            VALUES ('${name}', '${email}', '${hashedPassword}', ${date_format_millis});
   `);
@@ -183,13 +187,13 @@ export async function listTables(): Promise<any[] | undefined> {
 export async function doSelect(tableName: string): Promise<any[] | undefined> {
   try {
 
-    const query = `SELECT * FROM ${ tableName } `;
+    const query = `SELECT * FROM ${tableName} `;
     console.log(query)
     const result = await executeQuery(query);
     console.log(result);
     return result;
   } catch (error) {
-    console.log(`ERROR: doSelect(SELECT * FROM ${ tableName })`);
+    console.log(`ERROR: doSelect(SELECT * FROM ${tableName})`);
     console.log(error);
     return [];
   }
@@ -198,7 +202,7 @@ export async function doSelect(tableName: string): Promise<any[] | undefined> {
 export async function doTruncate(tableName: string): Promise<any[] | undefined> {
   try {
 
-    const query = `TRUNCATE TABLE ${ tableName } `;
+    const query = `TRUNCATE TABLE ${tableName} `;
     console.log(query)
     const result = await executeQuery(query);
     return result;
@@ -210,7 +214,7 @@ export async function doTruncate(tableName: string): Promise<any[] | undefined> 
 export async function doDrop(tableName: string): Promise<any[] | undefined> {
   try {
 
-    const query = `DROP TABLE ${ tableName } `;
+    const query = `DROP TABLE ${tableName} `;
     console.log(query)
     const result = await executeQuery(query);
     return result;
