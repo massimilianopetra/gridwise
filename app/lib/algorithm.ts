@@ -141,16 +141,16 @@ export function GridStrategy(
     }): StrategyResult {
     let gridprofit = 0;
     let _grid = grid;
-    let totInvest = 0;
     let profitableTrades = 0;
     let liquidity = 0;
     let quantity = 0;
     let pcarico = 0;
 
     console.log("***************************************");
+    console.log(`********** Grid Backtesting ***********`)
     console.log(flags);
     console.log("***************************************");
-    
+
     _grid = _grid.map((g) => {
         if (g.status == false) {
             liquidity += g.Quantity * g.buyPrice;
@@ -213,10 +213,6 @@ export function GridBackTesting(
     let liquidity = 0;
     let quantity = 0;
     let pcarico = 0;
-
-    console.log("***************************************");
-    console.log(flags);
-    console.log("***************************************");
 
     _grid = _grid.map((g) => {
         if (g.status == false) {

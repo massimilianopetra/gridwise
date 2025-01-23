@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { setToken } from '@/app/lib/token';
+import { setToken } from '@/app/lib/utility';
 
 export default function Page() {
 

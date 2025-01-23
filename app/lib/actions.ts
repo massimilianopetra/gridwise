@@ -27,8 +27,29 @@ import { Pool } from 'pg';
 import { date } from 'zod';
 import exp from 'constants';
 import bcrypt from 'bcrypt';
-import { cookies } from 'next/headers';
+import { Redis } from '@upstash/redis';
 
+/* ************************     REDIS     **************************** */
+
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+})
+
+export async function setKeyValue(key: string, value: string) {
+  await redis.set(key, value);
+}
+
+export async function getValueByKey(key: string): Promise<string | null> {
+  if (!key) {
+    throw new Error('Key is required');
+  }
+
+  // Recupera il valore associato alla chiave
+  const value = await redis.get<string>(key);
+   
+  return value;
+}
 
 /* ************************ SEED DATABASE **************************** */
 

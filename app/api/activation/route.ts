@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { setKeyValue } from '@/app/lib/actions';
 
 // Configura il trasportatore con Nodemailer
 const transporter = nodemailer.createTransport({
@@ -16,11 +17,20 @@ const transporter = nodemailer.createTransport({
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, subject, text } = body;
+    const { email } = body;
+
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
+    const subject = `Activation Code ${newCode}`;
+
+    console.log(`*** send activation code ***`);
+    console.log(`email: ${email} subject:${subject} text: ${message}`);
+
+    await setKeyValue(email,newCode);
 
     // Validazione dei campi richiesti
-    if (!email || !subject || !text) {
-      console.log(`email: ${email} subject:${subject} text: ${text}`)
+    if (!email) {
+      
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -32,18 +42,18 @@ export async function POST(req: Request) {
       from: process.env.EMAIL_FROM, // Mittente
       to: email, // Destinatario (usiamo il campo "email" dal body)
       subject: subject, // Oggetto
-      text: text, // Corpo del messaggio
+      text: message, // Corpo del messaggio
     });
 
     return NextResponse.json({
-      message: 'Email sent successfully',
+      message: 'Activation code sent successfully',
       info,
     });
 
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending activation code:', error);
     return NextResponse.json(
-      { error: 'Error sending email', details: "" },
+      { error: 'Error sending activation code', details: "" },
       { status: 500 }
     );
   }

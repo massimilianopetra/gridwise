@@ -13,6 +13,7 @@ import {
 import { AtSymbolIcon, KeyIcon } from '@heroicons/react/24/outline';
 import { addUsers } from '../lib/actions';
 import Link from 'next/link';
+import { getValueByKey } from '../lib/actions';
 
 export default function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -23,7 +24,6 @@ export default function RegisterForm() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error');
   const [showForm, setShowForm] = useState(true);
-  const [activationCode, setActivationCode] = useState('');
   const [enteredCode, setEnteredCode] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0); // tempo rimanente in secondi
@@ -40,8 +40,11 @@ export default function RegisterForm() {
 
   const handleSubmitVerify = async (e: React.FormEvent) => {
     e.preventDefault();
+
     // Logica di verifica del codice
+    const activationCode = await getValueByKey(email);
     console.log(`EnteredcCode ${enteredCode} - ${activationCode}`)
+
     if (enteredCode.toString() == activationCode) {
       setIsVerified(true);
 
@@ -58,19 +61,13 @@ export default function RegisterForm() {
   };
 
   const handleResendCode = async () => {
-    // Logica per inviare di nuovo il codice (ad esempio, se l'utente ha perso la mail)
-    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
-    setActivationCode(newCode);
 
-    const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
-    const subject = `Activation Code ${newCode}`;
-
-    await fetch('/api/send-email', {
+    await fetch('/api/activation', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email: email, subject: subject, text: message }),
+      body: JSON.stringify({ email: email}),
     });
 
     // Imposta il cooldown a 3 minuti (180 secondi)
@@ -112,18 +109,13 @@ export default function RegisterForm() {
 
     // Handle registration logic here
     setShowForm(false);
-    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
-    setActivationCode(newCode);
 
-    const message = `This is your activation code: ${newCode} for emai ${email} at OpenTradeNet`;
-    const subject = `Activation Code ${newCode}`;
-
-    await fetch('/api/send-email', {
+    await fetch('/api/activation', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email: email, subject: subject, text: message }),
+      body: JSON.stringify({ email: email }),
     });
 
   };
