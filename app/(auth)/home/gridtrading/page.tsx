@@ -8,6 +8,9 @@ import TabContent3 from "./TabContent3";
 import Marquee from "@/app/ui/Marquee";
 import { StockMarketQuote } from '@/app/lib/definitions';
 import { GetCryptoQuote } from '@/app/lib/utility';
+import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
+import DirectionsRunOutlinedIcon from '@mui/icons-material/DirectionsRunOutlined';
+import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
 
 
 const Page = () => {
@@ -78,16 +81,22 @@ const Page = () => {
         >
           <Tab
             label="Compute"
+            icon={<CalculateOutlinedIcon />} 
+            iconPosition="end" 
             className={`text-sm font-medium ${activeTab === 0 ? "text-blue-600" : "text-gray-500"
               }`}
           />
           <Tab
             label="Run"
+            icon={<DirectionsRunOutlinedIcon />} 
+            iconPosition="end" 
             className={`text-sm font-medium ${activeTab === 1 ? "text-blue-600" : "text-gray-500"
               }`}
           />
           <Tab
             label="Analysis"
+            icon={<AnalyticsOutlinedIcon />} 
+            iconPosition="end" 
             className={`text-sm font-medium ${activeTab === 2 ? "text-blue-600" : "text-gray-500"
               }`}
           />
