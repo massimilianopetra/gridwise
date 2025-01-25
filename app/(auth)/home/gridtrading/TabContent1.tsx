@@ -428,7 +428,7 @@ export default function Page() {
                     return (!prevSelected)
                   })
                 } />}
-                label={selInteger ? 'Geometric Grid' : 'Linear Grid'}
+                label={selGeometric ? 'Geometric Grid' : 'Linear Grid'}
               />
             </div>
             <div className='flex flex-row space-x-4'>
