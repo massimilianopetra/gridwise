@@ -19,6 +19,61 @@
 
 import { GridType, StockData, FlagSectionData, StrategyResult } from '@/app/lib/definitions';
 
+export function LinearGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number, selInteger: boolean, aleady=0): GridType[] {
+
+    const grid_inc = (Pb-Pa)/ n;
+    var result: GridType[] = [];
+
+    // Controllo congruenza parametri
+    if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {
+
+
+        for (let iteration = 0; iteration < niteration; iteration++) {
+            const local_result: GridType[] = [];
+            var saved = 0;
+            for (let i = 0; i < n; i++) {
+
+                const priceBuy = Pa + grid_inc*i;
+                const priceSell = Pa + grid_inc*(i + 1);
+                const qty = (investment / n) / priceBuy
+                const earn = qty * (priceSell - priceBuy);
+                if (P > priceBuy) {
+                    local_result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, effectiveBuyPrice: 0, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: false });
+                } else {
+                    local_result.push({ id: i + 1, Quantity: qty, buyPrice: priceBuy, effectiveBuyPrice: P, capital: qty * priceBuy, sellPrice: priceSell, earn: earn, status: true });
+                    saved += (priceBuy - P) * qty;
+                }
+            }
+            investment = saved
+            if (iteration == 0) {
+                for (let i = 0; i < n; i++) {
+                    result.push(local_result[i]);
+                }
+            } else {
+                for (let i = 0; i < n; i++) {
+                    result[i] = { ...result[i],
+                        Quantity: result[i].Quantity+local_result[i].Quantity, 
+                        capital: result[i].capital+local_result[i].capital, 
+                        earn:result[i].earn+local_result[i].earn  }
+                }
+            }
+        }
+
+        if (selInteger) {
+            for (let i = 0; i < n; i++) {
+                result[i] = { ...result[i],
+                    Quantity: Math.trunc(result[i].Quantity), 
+                    capital: Math.trunc(result[i].Quantity)*result[i].buyPrice, 
+                    earn: Math.trunc(result[i].Quantity)*(result[i].sellPrice-result[i].buyPrice)}
+            }
+        }
+        
+        return (result);
+    } else {
+        return ([]);
+    }
+};
+
 export function GometricGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number,selPercentage: boolean, selInteger: boolean, aleady=0): GridType[] {
 
     console.log (selPercentage);

@@ -25,7 +25,7 @@ import { GridType } from '@/app/lib/definitions';
 
 
 
-export default function GridSummary({ rows, investment, P }: { rows: GridType[], investment: number, P: number }) {
+export default function GridSummary({ rows, investment, P, geometric }: { rows: GridType[], investment: number, P: number, geometric: boolean }) {
 
 
   const [currency, setCurrency] = useState<string>('EUR');
@@ -52,6 +52,13 @@ export default function GridSummary({ rows, investment, P }: { rows: GridType[],
     }
   });
 
+  var grid_step = "";
+  if (geometric) {
+    grid_step = (100 * rows[0].earn / (rows[0].buyPrice*rows[0].Quantity)).toFixed(3)+"%";
+  } else {
+    grid_step = (rows[0].sellPrice-rows[0].buyPrice).toFixed(5)+" "+currency;
+  }
+
   const fields = [
     { label: "Proposed investment", value: investment.toFixed(2) +` ${currency}`},
     { label: "Quantity purchased immediately", value: qty.toFixed(5) },
@@ -61,7 +68,7 @@ export default function GridSummary({ rows, investment, P }: { rows: GridType[],
     { label: "Estimated max strategy profit", value: (rows[0].earn * 2.5 * rows.length).toFixed(2) +` ${currency}`},
     { label: "N. Grid ", value: rows.length },
     { label: "Single Grid Profit", value: rows[0].earn.toFixed(4) +` ${currency}`},
-    { label: "Grid Step", value: (100 * rows[0].earn / (rows[0].buyPrice*rows[0].Quantity)).toFixed(2)+"%" },
+    { label: "Grid Step", value: grid_step },
 
   ];
 
