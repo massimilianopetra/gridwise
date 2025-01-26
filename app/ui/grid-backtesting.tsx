@@ -27,7 +27,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import CsvFileReader from '@/app/ui/CsvFileReader';
 import { StockData } from '@/app/lib/definitions'
-import { HoldStrategy, GridStrategy, GetHoldQuantity } from '@/app/lib/algorithm';
+import { HoldStrategy, GridStrategy, GetHoldQuantity, Drawdown } from '@/app/lib/algorithm';
 import FlagSection from '@/app/ui/FlagSection';
 import TradingChart from '@/app/ui/TradingChart';
 
@@ -55,7 +55,6 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
     ({ rows,}, ref) => {
         const [open, setOpen] = useState(false);
 
-        const [summary, setSummary] = useState<ISummary>();
         const [isGraphPercentage, setIsGraphPercentage] = useState(false);
         const [isViewGrid, setIsViewGrid] = useState(false);
         const [holdstrategy, setSetHoldstrategy] = useState<StockData[]>([]);
@@ -99,14 +98,6 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
             ]);
 
 
-            let gridProfit = 0;
-            if (g.gridProfit) {
-                gridProfit = g.gridProfit
-            }
-            let profitableTrades = 0;
-            if (g.profitableTrades) {
-                profitableTrades = g.profitableTrades
-            }
 
 
             const f1 = [
@@ -115,7 +106,7 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
                 { label: "Strategy Gain", value: (100 * (h.stockdata[h.stockdata.length - 1].value - h.stockdata[0].value) / h.stockdata[0].value).toFixed(2) + `%` },
                 { label: "Initial Price", value: h.initialPrice.toString() + ` ${currency}` },
                 { label: "Final Price", value: h.finalPrice.toFixed(2) + ` ${currency}` },
-                { label: "DrawDown", value: ""+ `%` },
+                { label: "DrawDown", value: Drawdown(h.stockdata).toFixed(2)+ `%` },
             ];
 
             setFieldsHoldStrategy(f1);
@@ -125,9 +116,9 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
                 { label: "Initial Capital", value: g.stockdata[0].value.toFixed(2) + ` ${currency}` },
                 { label: "Final Capital", value: g.stockdata[g.stockdata.length - 1].value.toFixed(2) + ` ${currency}` },
                 { label: "Strategy Gain", value: (100 * (g.stockdata[g.stockdata.length - 1].value - g.stockdata[0].value) / g.stockdata[0].value).toFixed(2) + `%` },
-                { label: "Profitable Trades", value: profitableTrades.toString() },
-                { label: "Grid Profit", value: gridProfit.toFixed(2) + ` ${currency}` },
-                { label: "DrawDown", value: ""+ `%` },
+                { label: "Profitable Trades", value: g.profitableTrades.toString() },
+                { label: "Grid Profit", value: g.gridProfit.toFixed(2) + ` ${currency}` },
+                { label: "DrawDown", value: Drawdown(g.stockdata).toFixed(2)+ `%` },
             ];
 
             setFieldsGridStategy(f2);

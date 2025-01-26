@@ -17,7 +17,34 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { GridType, StockData, FlagSectionData, StrategyResult } from '@/app/lib/definitions';
+import { GridType, StockData, FlagSectionData, StrategyResult, GridStrategyResult } from '@/app/lib/definitions';
+
+
+export function Drawdown(data: StockData[]): number {
+    if (data.length === 0) {
+      return 0;
+    }
+  
+    let maxPeak = data[0].value; // Valore massimo raggiunto fino a un certo punto
+    let maxDrawdown = 0;     // Drawdown massimo in valore assoluto
+  
+    for (let i = 1; i < data.length; i++) {
+      if (data[i].value > maxPeak) {
+        maxPeak = data[i].value; // Aggiorna il picco massimo
+      } else {
+        const drawdown = maxPeak - data[i].value; // Calcola il drawdown
+        if (drawdown > maxDrawdown) {
+          maxDrawdown = drawdown; // Aggiorna il drawdown massimo
+        }
+      }
+    }
+  
+    // Calcolo del drawdown percentuale massimo
+    const maxDrawdownPercent = maxPeak !== 0 ? (maxDrawdown / maxPeak) * 100 : 0;
+  
+    return (maxDrawdownPercent);
+
+  }
 
 export function LinearGrid(investment: number, Pa: number, Pb: number, P: number, n: number, niteration: number, selInteger: boolean, aleady=0): GridType[] {
 
@@ -193,7 +220,7 @@ export function GridStrategy(
         sellOnGrid: false,
         commissionPercentage: "0",
         fixedCommission: "0",
-    }): StrategyResult {
+    }): GridStrategyResult {
     let gridprofit = 0;
     let _grid = grid;
     let profitableTrades = 0;
