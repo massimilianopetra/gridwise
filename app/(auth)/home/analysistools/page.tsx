@@ -31,7 +31,6 @@ import GridTable from '@/app/ui/grid-table';
 import GridSummary from '@/app/ui/grid-summary';
 import { GometricGrid } from '@/app/lib/algorithm';
 import CsvFileReader from '@/app/ui/CsvFileReader';
-import { GridBackTesting, HoldStrategy, GridStrategy } from '@/app/lib/algorithm';
 import { StockData } from '@/app/lib/definitions'
 import TradingChart from '@/app/ui/TradingChart';
 import FlagSection from '@/app/ui/FlagSection';
