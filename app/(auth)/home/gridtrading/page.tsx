@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Tabs, Tab, Box, Typography } from "@mui/material";
-import TabContent1 from "./TabContent1";
-import TabContent2 from "./TabContent2";
-import TabContent3 from "./TabContent3";
+import TabContent1 from "./TabGridCalculator";
+import TabContent2 from "./TabTedingBot";
+import TabContent3 from "./TabGridAnalysis";
 import Marquee from "@/app/ui/Marquee";
 import { StockMarketQuote } from '@/app/lib/definitions';
 import { GetCryptoQuote } from '@/app/lib/utility';

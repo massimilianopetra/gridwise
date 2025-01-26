@@ -51,7 +51,10 @@ export type StockMarketQuote = {
 
 export type StrategyResult = {
   stockdata: StockData[],
-  summary: any
+  profitableTrades?: number,
+  gridProfit?: number,
+  initialPrice: number,
+  finalPrice: number,
 }
 
 export interface FlagSectionData {

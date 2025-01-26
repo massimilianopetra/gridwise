@@ -28,22 +28,9 @@ import { GridType } from '@/app/lib/definitions';
 import GridTable from '@/app/ui/grid-table';
 import GridSummary from '@/app/ui/grid-summary';
 import { GometricGrid, LinearGrid } from '@/app/lib/algorithm';
-import CsvFileReader from '@/app/ui/CsvFileReader';
-import { GridBackTesting, HoldStrategy, GridStrategy, GetHoldQuantity } from '@/app/lib/algorithm';
 import { parseCsv } from '@/app/lib/utility';
-import { StockData } from '@/app/lib/definitions'
-import TradingChart from '@/app/ui/TradingChart';
-import FlagSection from '@/app/ui/FlagSection';
+import GridBacktesting, { GridBacktestingRef } from '@/app/ui/grid-backtesting';
 
-interface ISummary {
-  profitableTrades: number,
-  gridProfit: number
-}
-interface GraphSeries {
-  data: StockData[],
-  color: string,
-  title?: string
-}
 
 export default function Page() {
   const [open, setOpen] = useState(false);
@@ -51,15 +38,9 @@ export default function Page() {
   const [selPercentage, setSelPercentage] = useState(false);
   const [selInteger, setSelInteger] = useState(false);
   const [selGeometric, setSelGeometric] = useState(false);
-  const [summary, setSummary] = useState<ISummary>();
-  const [viewGraph, setViewgraph] = useState(false);
-  const [isGraphPercentage, setIsGraphPercentage] = useState(false);
-  const [isViewGrid, setIsViewGrid] = useState(false);
   const [rows, setRows] = useState<GridType[]>([]);
-  const [holdstrategy, setSetHoldstrategy] = useState<StockData[]>([]);
-  const [gridstrategy, setSetGridstrategy] = useState<StockData[]>([]);
-  const [series, setSeries] = useState<GraphSeries[]>([]);
   const [status, setStatus] = useState("initial");
+
   const inputInvestmentRef = useRef<HTMLInputElement>(null);
   const inputPaRef = useRef<HTMLInputElement>(null);
   const inputPbRef = useRef<HTMLInputElement>(null);
@@ -68,12 +49,8 @@ export default function Page() {
   const inputNIterationRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputAlreadyOwned = useRef<HTMLInputElement>(null);
-  const [flags, setFlags] = useState({
-    buyOnGrid: true,
-    sellOnGrid: true,
-    commissionPercentage: "0",
-    fixedCommission: "0",
-  });
+  const gridBacktestingRef = useRef<GridBacktestingRef>(null);
+
   const [decimalSeparator, setDecimalSeparator] = useState<string>(',');
   const [currency, setCurrency] = useState<string>('EUR');
   const [geid, setGEID] = useState<string>('10');
@@ -157,7 +134,7 @@ export default function Page() {
 
   const handleButtonCompute = () => {
     setStatus("computing");
-    setViewgraph(false);
+
     const investment = parseFloat(inputInvestmentRef.current?.value || '0');
     const Pa = parseFloat(inputPaRef.current?.value || '0');
     const Pb = parseFloat(inputPbRef.current?.value || '0');
@@ -168,6 +145,9 @@ export default function Page() {
     // Controllo congruenza parametri
     if (Pa > 0 && Pb > 0 && investment > 0 && n > 2 && P > 0 && Pb > Pa) {
 
+      if (gridBacktestingRef.current) {
+        gridBacktestingRef.current.reset(); // Chiama il metodo reset nel componente
+      }
       if (selGeometric) {
         const grid = GometricGrid(investment, Pa, Pb, P, n, iteration, selPercentage, selInteger);
         setRows(grid);
@@ -181,148 +161,6 @@ export default function Page() {
       setOpen(true);
     }
 
-  };
-
-
-  const handleFileLoad = (items: StockData[]) => {
-    const result = GridBackTesting(rows, items, flags);
-    const h = HoldStrategy(rows, items);
-    const g = GridStrategy(rows, items, flags);
-    setSetHoldstrategy(h.stockdata);
-    setSetGridstrategy(g.stockdata);
-    setSummary(g.summary)
-
-    setSeries([
-      { data: h.stockdata, color: '#f44336', title: 'Hold Strategy' },
-      { data: g.stockdata, color: '#4caf50', title: 'Grid Strategy' },
-    ]);
-    setViewgraph(true);
-
-    //setRawData(result.join("\n"));
-    console.log(result.join("\n"));
-
-  };
-
-  function buildSeries(percentage: boolean, grid: boolean) {
-
-    const P = parseFloat(inputPRef.current?.value || '0');
-    const qty = GetHoldQuantity(rows, P);
-    const grid_line: StockData[][] = Array.from({ length: rows.length + 1 }, () => [...holdstrategy]);
-
-
-
-    if (!percentage) {
-      /* absolute */
-
-      const originalArray = [
-        { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
-        { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
-      ];
-
-      if (grid) {
-
-        const transformedGridLine = grid_line.map((row, index) =>
-          row.map(item => {
-            if (index < rows.length) {
-              return ({ time: item.time, value: rows[index].buyPrice * qty });
-            } else {
-              return ({ time: item.time, value: rows[index - 1].sellPrice * qty });
-            }
-          })
-        );
-
-        // Aggiungi le righe di transformedGridLine all'array originale
-        const newArray = [
-          ...originalArray,
-          ...transformedGridLine.map((data, index) => ({
-            data: data,
-            color: '#00aaaa', // Colore personalizzato per ogni nuovo elemento
-            //title: `G${index + 1}`, // Titolo con numerazione (G1, G2, ...)
-          }))
-        ];
-        setSeries(newArray);
-      } else {
-        setSeries(originalArray);
-      }
-
-    } else {
-
-      /* percentage */
-
-      const h = holdstrategy.map((item) => {
-        return ({ ...item, value: 100 * (item.value - holdstrategy[0].value) / holdstrategy[0].value })
-      })
-      const g = gridstrategy.map((item) => {
-        return ({ ...item, value: 100 * (item.value - gridstrategy[0].value) / gridstrategy[0].value })
-      })
-
-      const originalArray = [
-        { data: h, color: '#f44336', title: 'Hold Strategy' },
-        { data: g, color: '#4caf50', title: 'Grid Strategy' },
-      ]
-
-      if (grid) {
-
-        const transformedGridLine = grid_line.map((row, index) =>
-          row.map(item => {
-            if (index < rows.length) {
-              return ({ time: item.time, value: 100 * (rows[index].buyPrice - P) / P });
-            } else {
-              return ({ time: item.time, value: 100 * (rows[index - 1].sellPrice - P) / P });
-            }
-          })
-        );
-
-        // Aggiungi le righe di transformedGridLine all'array originale
-        const newArray = [
-          ...originalArray,
-          ...transformedGridLine.map((data, index) => ({
-            data: data,
-            color: '#00aaaa', // Colore personalizzato per ogni nuovo elemento
-            //title: `G${index + 1}`, // Titolo con numerazione (G1, G2, ...)
-          }))
-        ];
-        setSeries(newArray);
-
-      } else {
-        setSeries(originalArray);
-      }
-
-    }
-  }
-
-  const handleToggleShowGrid = () => {
-    setIsViewGrid((prev) => {
-      if (prev) {
-        buildSeries(isGraphPercentage, false);
-        return false;
-      } else {
-        buildSeries(isGraphPercentage, true);
-        return true;
-      }
-    });
-
-  };
-
-  const handleToggleIsGraphPercentage = () => {
-    setIsGraphPercentage((prev) => {
-      if (prev) {
-        buildSeries(false, isViewGrid);
-        return false;
-      } else {
-        buildSeries(true, isViewGrid);
-        return true;
-      }
-    });
-
-  };
-
-  const handleFlagsChange = (updatedFlags: { buyOnGrid: boolean; sellOnGrid: boolean }) => {
-    setFlags((prev) => ({ ...prev, ...updatedFlags }));
-  };
-
-  const handleCommissionChange = (data: { commissionPercentage: string; fixedCommission: string }) => {
-    setFlags((prev) => ({ ...prev, ...data }));
   };
 
 
@@ -476,6 +314,7 @@ export default function Page() {
             />
           </CardActions>
         </Card>
+
         {(status == "computed") &&
           <>
             <GridTable rows={rows} />
@@ -484,54 +323,15 @@ export default function Page() {
               rows={rows}
               investment={parseFloat(inputInvestmentRef.current?.value || '0')}
               P={parseFloat(inputPRef.current?.value || '0')}
-              geometric = {selGeometric}
+              geometric={selGeometric}
             />
             <br></br>
-            <Card sx={{ maxWidth: 1200, margin: 'auto', padding: 2, backgroundColor: '#E0E0E0', borderRadius: '12px', }}>
-              <Typography className="text-blue-900 text-center" variant="h5" gutterBottom>
-                Investment Backtesting
-              </Typography>
+            <GridBacktesting
+              ref={gridBacktestingRef}
+              rows={rows}
+              P={parseFloat(inputPRef.current?.value || '0')}
+            />
 
-
-              <CsvFileReader onFileLoad={handleFileLoad} />
-              <br></br>
-              <FlagSection onFlagsChange={handleFlagsChange} onCommissionChange={handleCommissionChange} />
-
-
-
-              <br></br>
-              {viewGraph &&
-                (<>
-                  <p>Initial Capital: {gridstrategy[0].value.toFixed(2)} </p>
-                  <p>Final Capital: {gridstrategy[gridstrategy.length - 1].value.toFixed(2)} </p>
-                  <p>Strategy Gain: {(100 * (gridstrategy[gridstrategy.length - 1].value - gridstrategy[0].value) / gridstrategy[0].value).toFixed(2)}%  </p>
-                  <p>Profitable Trades: {summary?.profitableTrades} </p>
-                  <p>Grid Profit: {summary?.gridProfit.toFixed(2)}$ </p>
-                </>
-                )}
-              <br></br>
-
-              <div>
-                {viewGraph && (
-                  <>
-                    <div className="flex justify-between items-center mb-2">
-                      <FormControlLabel
-                        control={<Switch checked={isGraphPercentage} onChange={handleToggleIsGraphPercentage} />}
-                        label={isGraphPercentage ? 'Percentage Value' : 'Absolute Value'}
-                      />
-                      <FormControlLabel
-                        control={<Switch checked={isViewGrid} onChange={handleToggleShowGrid} />}
-                        label={isViewGrid ? 'Hide Grid' : 'Show Grid'}
-                      />
-                    </div>
-                    <TradingChart
-                      series={series}
-                      className="bg-gray-800"
-                    />
-                  </>
-                )}
-              </div>
-            </Card>
           </>
         }
 
