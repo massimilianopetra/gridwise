@@ -9,9 +9,8 @@ import Marquee from "@/app/ui/Marquee";
 import { StockMarketQuote } from '@/app/lib/definitions';
 import { GetCryptoQuote } from '@/app/lib/utility';
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
-import DirectionsRunOutlinedIcon from '@mui/icons-material/DirectionsRunOutlined';
-import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
-
+import InsightsOutlined from '@mui/icons-material/InsightsOutlined';
+import SmartToyOutlined  from'@mui/icons-material/SmartToyOutlined';
 
 const Page = () => {
 
@@ -80,22 +79,22 @@ const Page = () => {
           className="border-b border-gray-200"
         >
           <Tab
-            label="Compute"
+            label="Grid Calculator"
             icon={<CalculateOutlinedIcon />} 
             iconPosition="end" 
             className={`text-sm font-medium ${activeTab === 0 ? "text-blue-600" : "text-gray-500"
               }`}
           />
           <Tab
-            label="Run"
-            icon={<DirectionsRunOutlinedIcon />} 
+            label="Trading Bot"
+            icon={<SmartToyOutlined />} 
             iconPosition="end" 
             className={`text-sm font-medium ${activeTab === 1 ? "text-blue-600" : "text-gray-500"
               }`}
           />
           <Tab
-            label="Analysis"
-            icon={<AnalyticsOutlinedIcon />} 
+            label="Grid Analysis"
+            icon={<InsightsOutlined />} 
             iconPosition="end" 
             className={`text-sm font-medium ${activeTab === 2 ? "text-blue-600" : "text-gray-500"
               }`}
