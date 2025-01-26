@@ -20,7 +20,7 @@
  */
 
 import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
-import { Card, Typography, FormControlLabel, Box, Grid, TextField } from '@mui/material';
+import { Card, Typography, FormControlLabel, Box, Grid, TextField, Paper } from '@mui/material';
 import { GridType } from '@/app/lib/definitions';
 import Switch from '@mui/material/Switch';
 import Snackbar from '@mui/material/Snackbar';
@@ -51,8 +51,8 @@ export type GridBacktestingRef = {
     reset: () => void;
 };
 
-const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; P: number }>(
-    ({ rows, P }, ref) => {
+const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
+    ({ rows,}, ref) => {
         const [open, setOpen] = useState(false);
 
         const [summary, setSummary] = useState<ISummary>();
@@ -62,7 +62,9 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; P: nu
         const [gridstrategy, setSetGridstrategy] = useState<StockData[]>([]);
         const [series, setSeries] = useState<GraphSeries[]>([]);
         const [viewGraph, setViewgraph] = useState(false);
-        const [fields, setFields] = useState<ILabelValue[]>([]);
+        const [fieldsHold, setFieldsHoldStrategy] = useState<ILabelValue[]>([]);
+        const [fieldsGrid, setFieldsGridStategy] = useState<ILabelValue[]>([]);
+        const [P, setP] = useState(0)
 
         const [flags, setFlags] = useState({
             buyOnGrid: true,
@@ -107,16 +109,29 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; P: nu
             }
 
 
-            const f = [
-                { label: "Initial Capital", value: g.stockdata[0].value.toFixed(2) + ` ${currency}` },
-                { label: "Final Capital", value: g.stockdata[g.stockdata.length - 1].value.toFixed(2) + ` ${currency}` },
-                { label: "Grid Strategy Gain", value: (100 * (g.stockdata[g.stockdata.length - 1].value - g.stockdata[0].value) / g.stockdata[0].value).toFixed(2) + `%` },
-                { label: "Profitable Trades", value: profitableTrades.toString() },
-                { label: "Grid Profit", value: gridProfit.toFixed(2) + ` ${currency}` }
+            const f1 = [
+                { label: "Initial Capital", value: h.stockdata[0].value.toFixed(2) + ` ${currency}` },
+                { label: "Final Capital", value: h.stockdata[h.stockdata.length - 1].value.toFixed(2) + ` ${currency}` },
+                { label: "Strategy Gain", value: (100 * (h.stockdata[h.stockdata.length - 1].value - h.stockdata[0].value) / h.stockdata[0].value).toFixed(2) + `%` },
+                { label: "Initial Price", value: h.initialPrice.toString() + ` ${currency}` },
+                { label: "Final Price", value: h.finalPrice.toFixed(2) + ` ${currency}` },
+                { label: "DrawDown", value: ""+ `%` },
             ];
 
-            setFields(f);
+            setFieldsHoldStrategy(f1);
+            setP(h.initialPrice);
 
+            const f2 = [
+                { label: "Initial Capital", value: g.stockdata[0].value.toFixed(2) + ` ${currency}` },
+                { label: "Final Capital", value: g.stockdata[g.stockdata.length - 1].value.toFixed(2) + ` ${currency}` },
+                { label: "Strategy Gain", value: (100 * (g.stockdata[g.stockdata.length - 1].value - g.stockdata[0].value) / g.stockdata[0].value).toFixed(2) + `%` },
+                { label: "Profitable Trades", value: profitableTrades.toString() },
+                { label: "Grid Profit", value: gridProfit.toFixed(2) + ` ${currency}` },
+                { label: "DrawDown", value: ""+ `%` },
+            ];
+
+            setFieldsGridStategy(f2);
+            setIsViewGrid(false);
             setViewgraph(true);
 
         };
@@ -283,31 +298,110 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; P: nu
                             </Typography>
 
 
-                            <Box sx={{ padding: 2 }}>
-                                <Grid container spacing={2}>
-                                    {fields.map((field, index) => (
-                                        <Grid item xs={4} key={index}>
-                                            <Box>
-                                                <Typography className='text-black' sx={{ marginBottom: 1 }}>
-                                                    {field.label}
-                                                </Typography>
-                                                <TextField
-                                                    value={field.value}
-                                                    variant="outlined"
-                                                    fullWidth
-                                                    InputProps={{
-                                                        readOnly: true,
-                                                        sx: { textAlign: "right" }, // Allinea il testo a destra
-                                                    }}
-                                                    sx={{
-                                                        backgroundColor: "white",
-                                                    }}
-                                                />
-                                            </Box>
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            </Box>
+                            <Paper
+                                sx={{
+                                    padding: 2,
+                                    border: '1px solid #ccc',
+                                    borderRadius: 2,
+                                    boxShadow: 2
+                                }}
+                            >
+                                {/* Titolo */}
+                                <Typography
+                                    variant="h6"
+                                    component="div"
+                                    sx={{
+                                        marginBottom: 2,
+                                        borderBottom: '1px solid #ccc',
+                                        paddingBottom: 1,
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Hold Strategy
+                                </Typography>
+
+                                {/* Contenuto */}
+                                <Box>
+                                    <Grid container spacing={2}>
+                                        {fieldsHold.map((field, index) => (
+                                            <Grid item xs={4} key={index}>
+                                                <Box>
+                                                    <Typography
+                                                        className="text-black"
+                                                        sx={{ marginBottom: 1 }}
+                                                    >
+                                                        {field.label}
+                                                    </Typography>
+                                                    <TextField
+                                                        value={field.value}
+                                                        variant="outlined"
+                                                        fullWidth
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                            sx: { textAlign: "right" },
+                                                        }}
+                                                        sx={{
+                                                            backgroundColor: "white",
+                                                        }}
+                                                    />
+                                                </Box>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Box>
+                            </Paper>
+                            <Paper
+                                sx={{
+                                    padding: 2,
+                                    border: '1px solid #ccc',
+                                    borderRadius: 2,
+                                    boxShadow: 2
+                                }}
+                            >
+                                {/* Titolo */}
+                                <Typography
+                                    variant="h6"
+                                    component="div"
+                                    sx={{
+                                        marginBottom: 2,
+                                        borderBottom: '1px solid #ccc',
+                                        paddingBottom: 1,
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Grid Strategy
+                                </Typography>
+
+                                {/* Contenuto */}
+                                <Box>
+                                    <Grid container spacing={2}>
+                                        {fieldsGrid.map((field, index) => (
+                                            <Grid item xs={4} key={index}>
+                                                <Box>
+                                                    <Typography
+                                                        className="text-black"
+                                                        sx={{ marginBottom: 1 }}
+                                                    >
+                                                        {field.label}
+                                                    </Typography>
+                                                    <TextField
+                                                        value={field.value}
+                                                        variant="outlined"
+                                                        fullWidth
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                            sx: { textAlign: "right" },
+                                                        }}
+                                                        sx={{
+                                                            backgroundColor: "white",
+                                                        }}
+                                                    />
+                                                </Box>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Box>
+                            </Paper>
                         </>
                         )}
                     <br></br>

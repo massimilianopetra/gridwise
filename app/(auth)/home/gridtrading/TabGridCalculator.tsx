@@ -329,7 +329,6 @@ export default function Page() {
             <GridBacktesting
               ref={gridBacktestingRef}
               rows={rows}
-              P={parseFloat(inputPRef.current?.value || '0')}
             />
 
           </>
