@@ -21,13 +21,14 @@
 
 import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
 import { Card, Typography, FormControlLabel, Box, Grid, TextField, Paper } from '@mui/material';
+import { MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
 import { GridType } from '@/app/lib/definitions';
 import Switch from '@mui/material/Switch';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import CsvFileReader from '@/app/ui/CsvFileReader';
-import { StockData } from '@/app/lib/definitions'
-import { HoldStrategy, GridStrategy, GetHoldQuantity, Drawdown } from '@/app/lib/algorithm';
+import { StockData, GridStrategyResult } from '@/app/lib/definitions'
+import { HoldStrategy, GridStrategy, GetHoldQuantity, Drawdown, ExpGridStrategy } from '@/app/lib/algorithm';
 import FlagSection from '@/app/ui/FlagSection';
 import TradingChart from '@/app/ui/TradingChart';
 
@@ -52,7 +53,7 @@ export type GridBacktestingRef = {
 };
 
 const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
-    ({ rows,}, ref) => {
+    ({ rows, }, ref) => {
         const [open, setOpen] = useState(false);
 
         const [isGraphPercentage, setIsGraphPercentage] = useState(false);
@@ -64,6 +65,7 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
         const [fieldsHold, setFieldsHoldStrategy] = useState<ILabelValue[]>([]);
         const [fieldsGrid, setFieldsGridStategy] = useState<ILabelValue[]>([]);
         const [P, setP] = useState(0)
+        const [selection, setSelection] = useState<string>('Static');
 
         const [flags, setFlags] = useState({
             buyOnGrid: true,
@@ -88,12 +90,20 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
 
         const handleFileLoad = (items: StockData[]) => {
             const h = HoldStrategy(rows, items);
-            const g = GridStrategy(rows, items, flags);
+            var g: GridStrategyResult = { stockdata: [], profitableTrades: 0, gridProfit: 0, initialPrice: 0, finalPrice: 0 };
+
+            console.log(selection);
+            if (selection == "Static") {
+                g = GridStrategy(rows, items, flags);
+            } else {
+                g = ExpGridStrategy(rows, items, 1 / 16.0, flags);
+            }
+
             setSetHoldstrategy(h.stockdata);
             setSetGridstrategy(g.stockdata);
 
             setSeries([
-                { data: h.stockdata, color: '#f44336', title: 'Hold Strategy' },
+                { data: h.stockdata, color: '#f44336', title: 'Benchmark' },
                 { data: g.stockdata, color: '#4caf50', title: 'Grid Strategy' },
             ]);
 
@@ -106,7 +116,7 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
                 { label: "Strategy Gain", value: (100 * (h.stockdata[h.stockdata.length - 1].value - h.stockdata[0].value) / h.stockdata[0].value).toFixed(2) + `%` },
                 { label: "Initial Price", value: h.initialPrice.toString() + ` ${currency}` },
                 { label: "Final Price", value: h.finalPrice.toFixed(2) + ` ${currency}` },
-                { label: "DrawDown", value: Drawdown(h.stockdata).toFixed(2)+ `%` },
+                { label: "DrawDown", value: Drawdown(h.stockdata).toFixed(2) + `%` },
             ];
 
             setFieldsHoldStrategy(f1);
@@ -118,7 +128,6 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
                 { label: "Strategy Gain", value: (100 * (g.stockdata[g.stockdata.length - 1].value - g.stockdata[0].value) / g.stockdata[0].value).toFixed(2) + `%` },
                 { label: "Profitable Trades", value: g.profitableTrades.toString() },
                 { label: "Grid Profit", value: g.gridProfit.toFixed(2) + ` ${currency}` },
-                { label: "DrawDown", value: Drawdown(g.stockdata).toFixed(2)+ `%` },
             ];
 
             setFieldsGridStategy(f2);
@@ -138,7 +147,7 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
                 /* absolute */
 
                 const originalArray = [
-                    { data: holdstrategy, color: '#f44336', title: 'Hold Strategy' },
+                    { data: holdstrategy, color: '#f44336', title: 'Benchmark' },
                     { data: gridstrategy, color: '#4caf50', title: 'Grid Strategy' },
                 ];
 
@@ -180,7 +189,7 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
                 })
 
                 const originalArray = [
-                    { data: h, color: '#f44336', title: 'Hold Strategy' },
+                    { data: h, color: '#f44336', title: 'Benchmark' },
                     { data: g, color: '#4caf50', title: 'Grid Strategy' },
                 ]
 
@@ -248,7 +257,12 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
             setFlags((prev) => ({ ...prev, ...data }));
         };
 
-
+        const handleChangeBot = (event: SelectChangeEvent<string>) => {
+            const newValue = event.target.value; // Il tipo è automaticamente string
+            setSelection(newValue);
+            console.log('Selected value:', newValue);
+            // Qui puoi aggiungere altre azioni personalizzate
+        };
 
         // Load preferences from localStorage or set defaults
         useEffect(() => {
@@ -273,7 +287,22 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
                     </Typography>
 
 
-                    <CsvFileReader onFileLoad={handleFileLoad} />
+                    <div className="flex items-center gap-x-4">
+                        <CsvFileReader onFileLoad={handleFileLoad} />
+                        <FormControl variant="outlined" className="w-64">
+                            <InputLabel id="dropdown-label">Trading Model</InputLabel>
+                            <Select
+                                labelId="dropdown-label"
+                                value={selection}
+                                onChange={handleChangeBot}
+                                label="Strategy Model"
+                                className="bg-white"
+                            >
+                                <MenuItem value="Static">Static</MenuItem>
+                                <MenuItem value="Dynamic">Dynamic</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
                     <br></br>
                     <FlagSection onFlagsChange={handleFlagsChange} onCommissionChange={handleCommissionChange} />
 
@@ -308,7 +337,7 @@ const GridBacktesting = forwardRef<GridBacktestingRef, { rows: GridType[]; }>(
                                         fontWeight: 'bold'
                                     }}
                                 >
-                                    Hold Strategy
+                                    Buy-and-Hold Strategy (Benchmark)
                                 </Typography>
 
                                 {/* Contenuto */}
